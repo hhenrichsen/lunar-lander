@@ -1,0 +1,36 @@
+[
+    {
+        "$id": "main",
+        "transitions": [ 
+            "play",
+            "high-scores",
+            "controls",
+            "credits"
+        ]
+    },
+    {
+        "$id": "play",
+        "transitions": [
+            "main",
+            "high-scores"
+        ]
+    },
+    {
+        "$id": "credits",
+        "transitions": [
+            "main"
+        ]
+    },
+    {
+        "$id": "controls",
+        "transitions": [
+            "main"
+        ]
+    },
+    {
+        "$id": "high-scores",
+        "transitions": [
+            "main"
+        ]
+    }
+]
