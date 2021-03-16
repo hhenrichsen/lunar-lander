@@ -2,6 +2,7 @@ import Ticking from './ticking';
 import Vector2 from './position';
 import Drawable from './drawable';
 import { Predicate } from './functional'
+import { drawTexture, Texture } from './texture';
 
 export class ParticleContainer<T> implements Ticking<T> {
     private particles: Array<ParticleEffect<T>>;
@@ -42,7 +43,9 @@ export class ParticleEmitter<T> implements Ticking<T> {
                     this._particleGenerator.direction(),
                     this._particleGenerator.velocity(),
                     this._particleGenerator.lifetime(),
-                    this._particleGenerator.rotation()))
+                    this._particleGenerator.rotation(),
+                    this._particleGenerator.texture(),
+                    this._particleGenerator.size()))
                 }
             }
         }
@@ -51,10 +54,12 @@ export class ParticleEmitter<T> implements Ticking<T> {
 }
 
 interface ParticleGenerator {
+    texture() : Texture,
     direction() : Vector2,
+    size(): Vector2,
     velocity() : number,
     lifetime() : number,
-    rotation() : number
+    rotation() : number,
 }
 
 export class ParticleEffect<T> implements Drawable<T>, Ticking<T> {
@@ -64,16 +69,21 @@ export class ParticleEffect<T> implements Drawable<T>, Ticking<T> {
     private _lifetime: number;
     private _rotation: number;
     private _elapsedLifetime: number;
-    constructor(center: Vector2, direction: Vector2, velocity: number, lifetime: number, rotation: number) {
+    private _texture: Texture;
+    private _size: Vector2;
+    constructor(center: Vector2, direction: Vector2, velocity: number, lifetime: number, rotation: number, texture: Texture, size: Vector2) {
         this._center = center;
         this._direction = direction;
         this._velocity = velocity;
         this._lifetime = lifetime;
         this._rotation = rotation;
+        this._texture = texture;
         this._elapsedLifetime = 0;
     }
 
-    draw(position: Vector2, state: T) {}
+    draw(context: CanvasRenderingContext2D, state: T) {
+        drawTexture(context, this._texture.texture, this._center, this._size, this._rotation)
+    }
 
     public get velocity() : number {
         return this._velocity;
