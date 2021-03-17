@@ -50,7 +50,6 @@ export class Vector2 {
         const rad = degrees * Math.PI / 180;
         let val = new Vector2(this.x * Math.cos(rad) - Math.sin(rad) * this.y, 
             this.x * Math.sin(rad) + this.y * Math.cos(rad));
-        console.log(val.toString())
         return val
     }
 

@@ -20,7 +20,6 @@ export class Terrain {
     constructor(iterations: number, roughness: number, p1: Vector2, p2: Vector2) {
         this.points = [p1, p2];
         for (let i = 0; i < iterations; i++) {
-            console.log(this.points);
             let savedLength = this.points.length;
             for (let j = 0; j < savedLength - 1; j++) {
                 let mid = new Vector2((this.points[j*2].x + this.points[j*2+1].x) / 2, 

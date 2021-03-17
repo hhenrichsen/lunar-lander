@@ -24,18 +24,20 @@ export class ParticleContainer<T> implements Ticking<T> {
 }
 
 export class ParticleEmitter<T> implements Ticking<T>, Drawable<T> {
-    private _rate: number;
-    private _elapsed: number;
-    private _count: number;
-    private _position: Vector2;
+    position: Vector2;
+    private _rate: number = 0.1;
+    private _elapsed: number = 0;
+    private _count: number = 10;
     private _container: ParticleContainer<T>
-    private _particleGenerator: ParticleGenerator
+    private _particleGenerator: ParticleGenerator<T>
     private _predicate: Predicate<T>
 
-    constructor(generator: ParticleGenerator, predicate: Predicate<T>) {
+    constructor(generator: ParticleGenerator<T>, predicate: Predicate<T>, rate: number = 0.1, count: number = 10) {
         this._container = new ParticleContainer<T>()
         this._particleGenerator = generator
         this._predicate = predicate;
+        this._count = count;
+        this._rate = rate;
     }
     draw(context: CanvasRenderingContext2D, state: T, coordinates?: CoordinateTranslatable): void {
         this._container.particles.forEach(p => {
@@ -49,13 +51,12 @@ export class ParticleEmitter<T> implements Ticking<T>, Drawable<T> {
             if (this._elapsed > this._rate) {
                 this._elapsed -= this._rate;
                 for (let i = 0; i < this._count; i++) {
-                    this._container.add(new ParticleEffect<T>(this._position,
-                    this._particleGenerator.direction(),
-                    this._particleGenerator.velocity(),
-                    this._particleGenerator.lifetime(),
-                    this._particleGenerator.rotation(),
-                    this._particleGenerator.texture(),
-                    this._particleGenerator.size()))
+                    this._container.add(new ParticleEffect<T>(this.position,
+                    this._particleGenerator.velocity(state),
+                    this._particleGenerator.lifetime(state),
+                    this._particleGenerator.rotation(state),
+                    this._particleGenerator.texture(state),
+                    this._particleGenerator.size(state)))
                 }
             }
         }
@@ -63,39 +64,40 @@ export class ParticleEmitter<T> implements Ticking<T>, Drawable<T> {
     }
 }
 
-export interface ParticleGenerator {
-    texture() : Texture,
-    direction() : Vector2,
-    size(): Vector2,
-    velocity() : number,
-    lifetime() : number,
-    rotation() : number,
+export interface ParticleGenerator<T> {
+    texture(state: T) : Texture,
+    size(state: T): Vector2,
+    velocity(state: T) : Vector2,
+    lifetime(state: T) : number,
+    rotation(state: T) : number,
 }
 
 export class ParticleEffect<T> implements Drawable<T>, Ticking<T> {
     private _center: Vector2;
     private _direction: Vector2;
-    private _velocity: number;
+    private _velocity: Vector2;
     private _lifetime: number;
     private _rotation: number;
     private _elapsedLifetime: number;
     private _texture: Texture;
     private _size: Vector2;
-    constructor(center: Vector2, direction: Vector2, velocity: number, lifetime: number, rotation: number, texture: Texture, size: Vector2) {
+    constructor(center: Vector2, velocity: Vector2, lifetime: number, rotation: number, texture: Texture, size: Vector2) {
         this._center = center;
-        this._direction = direction;
         this._velocity = velocity;
         this._lifetime = lifetime;
         this._rotation = rotation;
         this._texture = texture;
+        this._size = size;
         this._elapsedLifetime = 0;
     }
 
     draw(context: CanvasRenderingContext2D, state: T, coordinates: CoordinateTranslatable) {
+        context.globalAlpha = 1 - (this._elapsedLifetime / this._lifetime);
         drawTexture(context, this._texture, coordinates.translate(this._center), coordinates.translate(this._size), this._rotation);
+        context.globalAlpha = 1;
     }
 
-    public get velocity() : number {
+    public get velocity() : Vector2 {
         return this._velocity;
     }
 
@@ -113,6 +115,6 @@ export class ParticleEffect<T> implements Drawable<T>, Ticking<T> {
 
     public update(delta: number, _: T) {
         this._elapsedLifetime += delta;
-        this._center = this._center.add(this._direction.scale(delta * this._velocity));
+        this._center = this._center.add(this._velocity.scale(delta));
     }
 }

@@ -8,6 +8,8 @@ class Random {
 
         return rand / count;
     }
+
+    stdNormal(x)
 }
 
 export const random = new Random();

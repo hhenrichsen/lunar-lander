@@ -22,11 +22,9 @@ const terrain = new Terrain(5, 15, new Vector2(0, 70), new Vector2(100, 70));
 const safeZones = [];
 safeZones.push(terrain.insertSafeZone(10, 40, 15));
 safeZones.push(terrain.insertSafeZone(60, 90, 15));
-console.log(terrain.points);
 
 // Virtual Sizing
 let maxCoord = Math.min(window.innerWidth, window.innerHeight);
-console.log(maxCoord);
 canvas.width = maxCoord;
 canvas.height = maxCoord;
 let vcs = new VirtualCoordinateSystem(maxCoord / worldSize.x, maxCoord / worldSize.y);
@@ -51,7 +49,6 @@ const ticking = new Array<Ticking<GlobalState>>();
 
 // Command Creation
 commands.createCommand('enableThrust', (globalState) => {
-    console.log("Thrusting...")
     globalState.lander.thrusting = true;
 });
 
@@ -110,7 +107,7 @@ let globalState: GlobalState = {
     }
 };
 
-drawables.push(new ConditionalDrawable<GlobalState>((state: GlobalState) => !state.lander.crashed, lander));
+drawables.push(lander);
 ticking.push(lander);
 
 // Game loop
@@ -183,10 +180,3 @@ function drawText(context: CanvasRenderingContext2D) {
 }
 
 requestAnimationFrame(loop);
-
-function testVector() {
-    let v = new Vector2(0, 1);
-    console.log(v.rotate(90).toString());
-}
-
-testVector();
