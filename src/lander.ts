@@ -119,7 +119,7 @@ export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
       new ExplosionGenerator(),
       (state) => this._isExploding,
       0.1,
-      200
+      400
     );
     this.positionEmitters();
   }
@@ -206,7 +206,7 @@ export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
     if (this._isExploding) {
       this._explosionCount++;
     }
-    if (this._explosionCount > 30 * 2) {
+    if (this._explosionCount > 5) {
       this._isExploding = false;
     }
     this.thrustEmitter.update(delta, state);
@@ -229,6 +229,7 @@ export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
       }
       if (this.fuel < 0) {
         this.fuel = 0;
+        state.commands.execute('fuelExpired', state);
       }
       this._position = this._position.add(this._velocity.scale(delta));
       this.positionEmitters();

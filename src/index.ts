@@ -9,6 +9,7 @@ import { KeyManager } from "./key";
 import { CommandService } from "./command";
 import { drawTerrain, Terrain } from "./terrain";
 import { ConditionalDrawable } from "./conditionalDrawable";
+import { SoundEffect } from "./sound";
 
 // General Setup
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -59,34 +60,72 @@ const ticking = new Array<Ticking<GlobalState>>();
 
 // Command Creation
 commands.createCommand("enableThrust", (globalState) => {
-  globalState.lander.thrusting = true;
+    globalState.lander.thrusting = true;
+  if (globalState.lander.fuel > 0) {
+    globalState.sounds.mainThruster.play();
+  }
+  else {
+    globalState.sounds.noFuel.play();
+  }
 });
 
 commands.createCommand("disableThrust", (globalState) => {
   globalState.lander.thrusting = false;
+  globalState.sounds.mainThruster.stop();
+  globalState.sounds.noFuel.stop();
 });
+
+commands.createCommand("fuelExpired", (globalState) => {
+  if(globalState.sounds.mainThruster.playing) {
+    globalState.sounds.mainThruster.stop();
+    globalState.sounds.noFuel.play();
+  }
+  if(globalState.sounds.subThruster.playing) {
+    globalState.sounds.subThruster.stop();
+    globalState.sounds.noFuel.play();
+  }
+
+})
 
 commands.createCommand("beginTurnLeft", (globalState) => {
   globalState.lander.turningLeft = true;
+  if (globalState.lander.fuel > 0) {
+    globalState.sounds.subThruster.play();
+  }
+  else {
+    globalState.sounds.noFuel.play();
+  }
 });
 
 commands.createCommand("endTurnLeft", (globalState) => {
+  globalState.sounds.subThruster.stop();
+  globalState.sounds.noFuel.stop();
   globalState.lander.turningLeft = false;
 });
 
 commands.createCommand("beginTurnRight", (globalState) => {
+  if (globalState.lander.fuel > 0) {
+    globalState.sounds.subThruster.play();
+  }
+  else {
+    globalState.sounds.noFuel.play();
+  }
   globalState.lander.turningRight = true;
 });
 
 commands.createCommand("endTurnRight", (globalState) => {
+  globalState.sounds.subThruster.stop();
+  globalState.sounds.noFuel.stop();
   globalState.lander.turningRight = false;
 });
 
 commands.createCommand("safeLanding", (globalState) => {
+  globalState.sounds.landing.play();
   globalState.lander.freeze();
 });
 
 commands.createCommand("crashLanding", (globalState) => {
+  globalState.sounds.explosion.play();
   globalState.lander.crashed = true;
   globalState.lander.freeze();
 });
@@ -115,6 +154,13 @@ let globalState: GlobalState = {
     theta: 90,
     gravity: new Vector2(0, 1),
   },
+  sounds: {
+    mainThruster: new SoundEffect('assets/mainthruster.wav', 4),
+    subThruster: new SoundEffect('assets/subthruster.wav', 4),
+    explosion: new SoundEffect('assets/explosion.wav'),
+    landing: new SoundEffect('assets/landing.wav'),
+    noFuel: new SoundEffect('assets/nofuel.wav', 1)
+  }
 };
 
 drawables.push(lander);
