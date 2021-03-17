@@ -56,17 +56,39 @@ export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
 
     draw(context: CanvasRenderingContext2D, state: GlobalState, coordinates: CoordinateTranslatable) {
         drawTexture(context, this.texture, coordinates.translate(this.position), coordinates.translate(this.size), this.rotation);
+
+        // Debug collision
         context.beginPath();
         context.strokeStyle = "#ffffff";
         let circlepos = coordinates.translate(this.position);
         context.arc(circlepos.x, circlepos.y, coordinates.translate(new Vector2(4, 0)).x, 0, Math.PI * 2);
         context.stroke();
         let adjPos = coordinates.translate(this.position);
-        context.beginPath();
-        context.lineTo(adjPos.x, adjPos.y);
-        context.strokeStyle = "#ff0000";
+
+        // Debug rotation
         let adjVec = coordinates.translate(this.thrustVector.scale(5));
+        context.beginPath();
+        if (this.rotation % 360 < 5 && this.rotation % 360 > -5) {
+            context.strokeStyle = "#00ff00";
+        }
+        else {
+            context.strokeStyle = "#ff0000";
+        }
+        context.lineTo(adjPos.x, adjPos.y);
         context.lineTo(adjPos.x + adjVec.x, adjPos.y + adjVec.y);
+        context.stroke();
+
+        // Debug velocity
+        let velo = coordinates.translate(this.velocity.normalize().scale(5));
+        context.beginPath();
+        if (this.velocity.sqrMagnitude() < 4) {
+            context.strokeStyle = "#0000ff";
+        }
+        else {
+            context.strokeStyle = "#ff0000";
+        }
+        context.lineTo(adjPos.x, adjPos.y);
+        context.lineTo(adjPos.x + velo.x, adjPos.y + velo.y);
         context.stroke();
     }
 
@@ -81,27 +103,21 @@ export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
                 state.fuel -= state.fuelConsumption * delta;
                 this.rotation -= state.theta * delta;
                 this.thrustVector = this.thrustVector.rotate(-state.theta * delta);
-                console.log(`New Thrust Vector: ${this.thrustVector.x} ${this.thrustVector.y}`)
+                console.log(this.rotation);
             }
             if (state.turnRight) {
                 state.fuel -= state.fuelConsumption * delta;
                 this.rotation += state.theta * delta;
                 this.thrustVector = this.thrustVector.rotate(state.theta * delta);
-                console.log(`New Thrust Vector: ${this.thrustVector.x} ${this.thrustVector.y}`)
+                console.log(this.rotation);
             }
             this.velocity = this.velocity.add(state.gravity.scale(delta));
             if (state.thrust && state.fuel > 0) {
                 this.velocity = this.velocity.add(this.thrustVector.scale(delta * state.thrustCoefficient));
-                console.log(`New Velocity: ${this.velocity.x} ${this.velocity.y}`)
                 state.fuel -= state.fuelConsumption * delta;
             }
             this.position = this.position.add(this.velocity.scale(delta));
             // this.thrustEmitter.update(delta, state);
-        }
-        if (this.position.y > 90) {
-            this.position = new Vector2(this.position.x, 90);
-            this.velocity = Vector2.ZERO;
-            this.frozen = true;
         }
     }
 }
