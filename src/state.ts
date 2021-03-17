@@ -1,4 +1,5 @@
 import { CommandService } from './command';
+import { KeyManager } from './key';
 import { Lander } from './lander';
 import { Terrain } from './terrain';
 import Vector2 from './vector2';
@@ -17,7 +18,8 @@ export interface GlobalState {
     lander: Lander;
     terrain: Terrain;
     safeZones: Array<Array<Vector2>>,
-    commands: CommandService<GlobalState>
+    commands: CommandService<GlobalState>,
+    keys: KeyManager
 }
 
 export interface GameConfig {
