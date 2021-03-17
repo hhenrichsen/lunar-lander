@@ -39,8 +39,6 @@ class ThrustGenerator implements ParticleGenerator<GlobalState> {
   }
 }
 class ExplosionGenerator implements ParticleGenerator<GlobalState> {
-  private _rotationOffset: number;
-
   constructor(rotationOffset: number = 0) {
     this._rotationOffset = rotationOffset;
   }
@@ -81,7 +79,7 @@ export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
   private _rotationVector: Vector2;
   private _rotation: number;
   private _explosionCount: number = 0;
-  private _isExploding: boolean;
+  private _isExploding: boolean = false;
 
   fuel: number = 100;
   crashed: boolean = false;
