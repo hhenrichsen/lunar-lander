@@ -56,9 +56,11 @@ class KeyHandler {
 
 export class KeyManager {
     private handlers: Map<string, KeyHandler>;
-    public registerHandler(keyCode: string) {
+    private descriptions: Map<string, string>;
+    public registerHandler(keyCode: string, description?: string) {
         if (!this.handlers.has(keyCode)) {
             this.handlers.set(keyCode, new KeyHandler());
+            this.descriptions?.set(keyCode, description);
         }
         else {
             console.warn(`Key handler registered twice for keyCode ${keyCode}`);
@@ -89,6 +91,14 @@ export class KeyManager {
             handler.update(false, {alt: event.altKey, shift: event.shiftKey, ctrl: event.ctrlKey});
         }
     }
+    clear() {
+        this.handlers = new Map();
+    }
+
+    remove(keycode: string) {
+        this.handlers.delete(keycode);
+    }
+
     constructor() {
         window.addEventListener('keydown', this.updateDown.bind(this));
         window.addEventListener('keyup', this.updateUp.bind(this));
