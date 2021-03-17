@@ -19,6 +19,10 @@ module.exports = {
         {
           from: "assets",
           to: "assets"
+        },
+        {
+          from: "html",
+          to: "."
         }
       ]
     })

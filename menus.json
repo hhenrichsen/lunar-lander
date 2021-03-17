@@ -6,31 +6,36 @@
             "high-scores",
             "controls",
             "credits"
-        ]
+        ],
+        "content": ""
     },
     {
         "$id": "play",
         "transitions": [
             "main",
             "high-scores"
-        ]
+        ],
+        "content": ""
     },
     {
         "$id": "credits",
         "transitions": [
             "main"
-        ]
+        ],
+        "content": ""
     },
     {
         "$id": "controls",
         "transitions": [
             "main"
-        ]
+        ],
+        "content": ""
     },
     {
         "$id": "high-scores",
         "transitions": [
             "main"
-        ]
+        ],
+        "content": ""
     }
 ]

@@ -1,13 +1,13 @@
 class Random {
-    gaussian(count: number = 6) {
-        let rand = 0;
+  gaussian(count: number = 6) {
+    let rand = 0;
 
-        for (let i = 0; i < count; i++) {
-            rand += Math.random();
-        }
-
-        return rand / count;
+    for (let i = 0; i < count; i++) {
+      rand += Math.random();
     }
+
+    return rand / count;
+  }
 }
 
 export const random = new Random();
