@@ -16,7 +16,7 @@ export class SoundEffect {
         }
     }
 
-    play() {
+    play(): void {
         this.el.play();
         this.continue = true;
         this._playing = true;
@@ -28,18 +28,18 @@ export class SoundEffect {
         }
     }
 
-    playRec() {
+    playRec(): void {
         setTimeout(() => {if(!this.continue) return; this.el.currentTime = 0; this.playRec()}, this.cutoff * 1000);
     }
 
-    stop() {
+    stop(): void {
         this.el.pause();
         this.continue = false;
         this._playing = false;
         this.el.currentTime = 0;
     }
 
-    public get playing() {
+    public get playing(): boolean {
         return this._playing;
     }
 }
