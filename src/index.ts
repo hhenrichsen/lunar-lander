@@ -42,6 +42,8 @@ function resize() {
 
 window.addEventListener('resize', resize);
 
+const lander = new Lander(new Vector2(worldSize.x / 2, 0), landerTexture, new Vector2(10, 10));
+
 // State Initialization
 let globalState: GlobalState = {
     gravity: new Vector2(0, 1),
@@ -53,9 +55,10 @@ let globalState: GlobalState = {
     fuelConsumption: 0.5,
     thrustCoefficient: 10,
     theta: 90,
+    terrain: terrain,
+    lander: lander
 };
 
-const lander = new Lander(new Vector2(worldSize.x / 2, 0), landerTexture, new Vector2(10, 10));
 const drawables = new Array<Drawable<GlobalState>>();
 const ticking = new Array<Ticking<GlobalState>>();
 

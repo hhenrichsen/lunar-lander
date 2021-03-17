@@ -5,6 +5,8 @@ import { CoordinateTranslatable } from './coordinate';
 import { drawTexture, Texture } from './texture';
 import { GlobalState } from './state';
 import { ParticleEmitter, ParticleGenerator } from './particle';
+import { isColliding } from './collision';
+import Circle from './circle';
 
 class ThrustGenerator implements ParticleGenerator {
     private tex: Texture = new Texture('assets/Fire.png', new Vector2(5, 5))
@@ -70,6 +72,11 @@ export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
 
     update(delta: number, state: GlobalState): void {
         if (!this.frozen) {
+            for (let i = 0; i < state.terrain.points.length - 1; i++) {
+                if(isColliding(new Circle(this.position, 4), state.terrain.points[i], state.terrain.points[i+1])) {
+                    this.frozen = true;
+                }
+            }
             if (state.turnLeft) {
                 state.fuel -= state.fuelConsumption * delta;
                 this.rotation -= state.theta * delta;
