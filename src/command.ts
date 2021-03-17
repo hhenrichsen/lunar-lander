@@ -19,7 +19,7 @@ class Command<T> {
     }
 }
 
-class CommandService<T> {
+export class CommandService<T> {
     private commands: Map<string, Command<T>>
 
     constructor() {
@@ -27,19 +27,15 @@ class CommandService<T> {
     }
 
     public createCommand(name: string, action: CommandRunnable<T>) : void {
-        this.commands[name] = new Command(name, action);
+        this.commands.set(name, new Command(name, action));
     }
 
     public execute(name: string, state: T) : void {
-        if (this.commands[name] !== undefined) {
-            this.commands[name].invoke(state);
+        if (this.commands.has(name)) {
+            this.commands.get(name).invoke(state);
         }
         else {
             console.warn(`Attempting to invoke non-existent command ${name}`);
         }
     }
-}
-
-export function createCommandService<T>() : CommandService<T> {
-    return new CommandService<T>();
 }

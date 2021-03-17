@@ -42,19 +42,39 @@ class KeyHandler {
             this._wasPressed = !this._wasPressed;
         }
     }
+
+    addUp(action: KeyResponse) {
+        this._onKeyUp.add(action);
+    }
+    addDown(action: KeyResponse) {
+        this._onKeyDown.add(action);
+    }
+    addChanged(action: KeyResponse) {
+        this._onStateChanged.add(action);
+    }
 }
 
-class KeyManager {
-    private handlers: Map<string, KeyHandler> = new Map<string, KeyHandler>();
+export class KeyManager {
+    private handlers: Map<string, KeyHandler>;
     public registerHandler(keyCode: string) {
         if (!this.handlers.has(keyCode)) {
-            this.handlers[keyCode] = new KeyHandler();
+            this.handlers.set(keyCode, new KeyHandler());
         }
         else {
             console.warn(`Key handler registered twice for keyCode ${keyCode}`);
         }
     }
+    bindUp(keyCode: string, updateFn: KeyResponse) {
+        this.handlers.get(keyCode).addUp(updateFn);
+    }
+    bindDown(keyCode: string, updateFn: KeyResponse) {
+        this.handlers.get(keyCode).addDown(updateFn);
+    }
+    bindChanged(keyCode: string, updateFn: KeyResponse) {
+        this.handlers.get(keyCode).addChanged(updateFn);
+    }
     updateDown(event: KeyboardEvent) {
+        console.log(event.key);
         if (this.handlers.has(event.key)){
             event.preventDefault();
             const handler = this.handlers.get(event.key);
@@ -70,7 +90,8 @@ class KeyManager {
         }
     }
     constructor() {
-        window.addEventListener('keydown', this.updateDown);
-        window.addEventListener('keyup', this.updateUp);
+        window.addEventListener('keydown', this.updateDown.bind(this));
+        window.addEventListener('keyup', this.updateUp.bind(this));
+        this.handlers = new Map<string, KeyHandler>();
     }
 }

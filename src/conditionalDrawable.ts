@@ -1,7 +1,7 @@
 import Drawable from './drawable';
 
 export interface DrawPredicate<T> {
-    (context: CanvasRenderingContext2D, state: T);
+    (context: CanvasRenderingContext2D, state: T) : boolean;
 }
 
 export class ConditionalDrawable<T> implements Drawable<T> {

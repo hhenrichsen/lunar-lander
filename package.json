@@ -2,7 +2,7 @@
   "name": "lunarlander",
   "version": "1.0.0",
   "description": "A lunar lander canvas game.",
-  "main": "src/index.js",
+  "main": "src/lunarlander.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,6 +12,18 @@
     "typescript": "^4.2.3"
   },
   "devDependencies": {
-    "parcel": "^2.0.0-alpha.3.1"
+    "@babel/core": "^7.13.10",
+    "@babel/preset-env": "^7.13.10",
+    "@babel/preset-typescript": "^7.13.0",
+    "babel-loader": "^8.2.2",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "copy-webpack-plugin": "^8.0.0",
+    "file-loader": "^6.2.0",
+    "html-webpack-plugin": "^5.3.1",
+    "parcel": "^2.0.0-alpha.3.1",
+    "source-map-loader": "^2.0.1",
+    "ts-loader": "^8.0.18",
+    "webpack": "^5.26.2",
+    "webpack-cli": "^4.5.0"
   }
 }

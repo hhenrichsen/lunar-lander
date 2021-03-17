@@ -1,11 +1,12 @@
 import Ticking from './ticking';
-import Vector2 from './position';
+import Vector2 from './vector2';
 import Drawable from './drawable';
 import { Predicate } from './functional'
 import { drawTexture, Texture } from './texture';
+import { CoordinateTranslatable } from './coordinate';
 
 export class ParticleContainer<T> implements Ticking<T> {
-    private particles: Array<ParticleEffect<T>>;
+    particles: Array<ParticleEffect<T>>;
     update(delta: number, state: T) {
         // TODO: Check on the efficiency of this.
         this.particles = this.particles.filter(p => {
@@ -16,9 +17,13 @@ export class ParticleContainer<T> implements Ticking<T> {
     add(particle: ParticleEffect<T>) {
         this.particles.push(particle);
     }
+
+    constructor() {
+        this.particles = [];
+    }
 }
 
-export class ParticleEmitter<T> implements Ticking<T> {
+export class ParticleEmitter<T> implements Ticking<T>, Drawable<T> {
     private _rate: number;
     private _elapsed: number;
     private _count: number;
@@ -31,6 +36,11 @@ export class ParticleEmitter<T> implements Ticking<T> {
         this._container = new ParticleContainer<T>()
         this._particleGenerator = generator
         this._predicate = predicate;
+    }
+    draw(context: CanvasRenderingContext2D, state: T, coordinates?: CoordinateTranslatable): void {
+        this._container.particles.forEach(p => {
+            p.draw(context, state, coordinates);
+        })
     }
 
     update(delta: number, state: T) {
@@ -53,7 +63,7 @@ export class ParticleEmitter<T> implements Ticking<T> {
     }
 }
 
-interface ParticleGenerator {
+export interface ParticleGenerator {
     texture() : Texture,
     direction() : Vector2,
     size(): Vector2,
@@ -81,8 +91,8 @@ export class ParticleEffect<T> implements Drawable<T>, Ticking<T> {
         this._elapsedLifetime = 0;
     }
 
-    draw(context: CanvasRenderingContext2D, state: T) {
-        drawTexture(context, this._texture.texture, this._center, this._size, this._rotation)
+    draw(context: CanvasRenderingContext2D, state: T, coordinates: CoordinateTranslatable) {
+        drawTexture(context, this._texture, coordinates.translate(this._center), coordinates.translate(this._size), this._rotation);
     }
 
     public get velocity() : number {

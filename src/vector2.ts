@@ -1,4 +1,6 @@
 export class Vector2 {
+    static ZERO: Vector2 = new Vector2(0, 0);
+
     private _x: number = 0;
     private _y: number = 0;
 
@@ -22,6 +24,10 @@ export class Vector2 {
     get y() : number {
         return this._y;
     }
+
+    sqrMagnitude() : number {
+        return Math.pow(this.x, 2) + Math.pow(this.y, 2);
+    }
     
     magnitude() : number {
         return Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
@@ -38,6 +44,18 @@ export class Vector2 {
 
     add(other: Vector2): Vector2 {
         return new Vector2(this.x + other.x, this.y + other.y)
+    }
+
+    rotate(degrees: number) : Vector2 {
+        const rad = degrees * Math.PI / 180;
+        let val = new Vector2(this.x * Math.cos(rad) - Math.sin(rad) * this.y, 
+            this.x * Math.sin(rad) + this.y * Math.cos(rad));
+        console.log(val.toString())
+        return val
+    }
+
+    toString() : string {
+        return `Vector2(x: ${this.x}, y: ${this.y})`;
     }
 }
 
