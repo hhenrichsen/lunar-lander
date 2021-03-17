@@ -213,10 +213,10 @@ export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
     this.explosionEmitter.update(delta, state);
     if (!this.frozen) {
       if (this.turningLeft && this.fuel > 0) {
-        this.rotate(delta, state, -1);
+        this.rotate(delta, state, 1);
       }
       if (this.turningRight && this.fuel > 0) {
-        this.rotate(delta, state, 1);
+        this.rotate(delta, state, -1);
       }
       this._velocity = this._velocity.add(state.config.gravity.scale(delta));
       if (this.thrusting && this.fuel > 0) {

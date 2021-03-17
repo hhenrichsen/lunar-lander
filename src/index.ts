@@ -1,4 +1,4 @@
 import { buildState, start } from './game';
 
 var globalState = buildState();
-start(globalState);
+start(globalState, 1);

@@ -8,6 +8,8 @@ import Vector2 from "./vector2";
 export interface GlobalState {
   // Rates
   config: GameConfig;
+  // Game Running
+  running: boolean;
   // Important Objects
   lander: Lander;
   terrain: Terrain;

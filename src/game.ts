@@ -60,7 +60,9 @@ function loop (globalState: GlobalState) : FrameRequestCallback {
         update(delta / 1000, globalState)
         draw(globalState)
 
-        requestAnimationFrame(fn);
+        if (globalState.running) {
+            requestAnimationFrame(fn);
+        }
     }
     return fn
 }
@@ -203,21 +205,22 @@ function buildCommands (state: GlobalState): CommandService<GlobalState> {
 function buildKeys (state: GlobalState): KeyManager {
   // Default Keybindings
   const keys = new KeyManager()
-  keys.registerHandler(' ')
-  keys.registerHandler('q')
-  keys.registerHandler('e')
-  keys.bindDown(' ', () => state.commands.execute('enableThrust', state))
-  keys.bindUp(' ', () => state.commands.execute('disableThrust', state))
-  keys.bindDown('q', () => state.commands.execute('beginTurnLeft', state))
-  keys.bindUp('q', () => state.commands.execute('endTurnLeft', state))
-  keys.bindDown('e', () => state.commands.execute('beginTurnRight', state))
-  keys.bindUp('e', () => state.commands.execute('endTurnRight', state))
+  keys.registerHandler('ArrowUp')
+  keys.registerHandler('ArrowLeft')
+  keys.registerHandler('ArrowRight')
+  keys.bindDown('ArrowUp', () => state.commands.execute('enableThrust', state))
+  keys.bindUp('ArrowUp', () => state.commands.execute('disableThrust', state))
+  keys.bindDown('ArrowLeft', () => state.commands.execute('beginTurnLeft', state))
+  keys.bindUp('ArrowLeft', () => state.commands.execute('endTurnLeft', state))
+  keys.bindDown('ArrowRight', () => state.commands.execute('beginTurnRight', state))
+  keys.bindUp('ArrowRight', () => state.commands.execute('endTurnRight', state))
   return keys
 }
 
 export function buildState (): GlobalState {
   let globalState: GlobalState = {
     terrain: undefined,
+    running: true,
     lander: undefined,
     safeZones: undefined,
     commands: undefined,
@@ -250,14 +253,14 @@ export function start (globalState: GlobalState, difficulty: number = 1) {
   globalState.lander = lander
   drawables.push(lander)
   ticking.push(lander)
-  const terrain = new Terrain(5, 15, new Vector2(0, 70), new Vector2(100, 70))
+  const terrain = new Terrain(8, 100, new Vector2(0, 50), new Vector2(100, 50))
   const safeZones: Array<Array<Vector2>> = []
   const count = 3 - difficulty;
   const min = 10;
   const max = 90;
   const validPortions = (max - min) / count;
   for (let i = 0; i < count; i++) {
-    safeZones.push(terrain.insertSafeZone(min + validPortions * i, min + validPortions * (i + 1), count * 10));
+    safeZones.push(terrain.insertSafeZone(min + validPortions * i, min + validPortions * (i + 1), count * 7.5));
   }
 
   globalState.terrain = terrain;
