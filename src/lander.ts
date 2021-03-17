@@ -34,29 +34,32 @@ class ThrustGenerator implements ParticleGenerator {
 
 export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
     private position: Vector2;
-    private velocity: Vector2;
+    private _velocity: Vector2;
     private size: Vector2;
     private thrustOffset: Vector2;
     private thrustVector: Vector2;
     private texture: Texture;
     private frozen: boolean;
     private thrustEmitter: ParticleEmitter<GlobalState>;
-    private rotation: number;
+    private _rotation: number;
 
     constructor(position: Vector2, texture: Texture, size: Vector2) {
         this.position = position;
         this.texture = texture;
         this.size = size;
-        this.velocity = new Vector2(0, 0);
+        this._velocity = new Vector2(0, 0);
         this.frozen = false;
         this.thrustOffset = new Vector2(0.0 * size.x, 0.3 * size.y);
         this.thrustVector = new Vector2(0, -1);
-        this.rotation = 0;
+        this._rotation = 0;
     }
 
     draw(context: CanvasRenderingContext2D, state: GlobalState, coordinates: CoordinateTranslatable) {
-        drawTexture(context, this.texture, coordinates.translate(this.position), coordinates.translate(this.size), this.rotation);
+        drawTexture(context, this.texture, coordinates.translate(this.position), coordinates.translate(this.size), this._rotation);
+        // this.debugDraw(context, state, coordinates);
+    }
 
+    private debugDraw(context: CanvasRenderingContext2D, state: GlobalState, coordinates: CoordinateTranslatable) {
         // Debug collision
         context.beginPath();
         context.strokeStyle = "#ffffff";
@@ -68,7 +71,7 @@ export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
         // Debug rotation
         let adjVec = coordinates.translate(this.thrustVector.scale(5));
         context.beginPath();
-        if (this.rotation % 360 < 5 && this.rotation % 360 > -5) {
+        if (this._rotation % 360 < 5 && this._rotation % 360 > -5) {
             context.strokeStyle = "#00ff00";
         }
         else {
@@ -79,9 +82,9 @@ export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
         context.stroke();
 
         // Debug velocity
-        let velo = coordinates.translate(this.velocity.normalize().scale(5));
+        let velo = coordinates.translate(this._velocity.normalize().scale(5));
         context.beginPath();
-        if (this.velocity.sqrMagnitude() < 4) {
+        if (this._velocity.sqrMagnitude() < 4) {
             context.strokeStyle = "#0000ff";
         }
         else {
@@ -99,25 +102,36 @@ export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
                     this.frozen = true;
                 }
             }
-            if (state.turnLeft) {
-                state.fuel -= state.fuelConsumption * delta;
-                this.rotation -= state.theta * delta;
-                this.thrustVector = this.thrustVector.rotate(-state.theta * delta);
-                console.log(this.rotation);
+            if (state.turnLeft && state.fuel > 0) {
+                this.rotate(delta, state, -1);
             }
-            if (state.turnRight) {
-                state.fuel -= state.fuelConsumption * delta;
-                this.rotation += state.theta * delta;
-                this.thrustVector = this.thrustVector.rotate(state.theta * delta);
-                console.log(this.rotation);
+            if (state.turnRight && state.fuel > 0) {
+                this.rotate(delta, state, 1);
             }
-            this.velocity = this.velocity.add(state.gravity.scale(delta));
+            this._velocity = this._velocity.add(state.config.gravity.scale(delta));
             if (state.thrust && state.fuel > 0) {
-                this.velocity = this.velocity.add(this.thrustVector.scale(delta * state.thrustCoefficient));
-                state.fuel -= state.fuelConsumption * delta;
+                this._velocity = this._velocity.add(this.thrustVector.scale(delta * state.config.thrustCoefficient));
+                state.fuel -= state.config.fuelConsumption * delta;
             }
-            this.position = this.position.add(this.velocity.scale(delta));
+            if (state.fuel < 0) {
+                state.fuel = 0;
+            }
+            this.position = this.position.add(this._velocity.scale(delta));
             // this.thrustEmitter.update(delta, state);
         }
+    }
+
+    private rotate(delta: number, state: GlobalState, direction: number) {
+        state.fuel -= state.config.fuelConsumption * delta;
+        this._rotation += direction * state.config.theta * delta;
+        this.thrustVector = this.thrustVector.rotate(direction * state.config.theta * delta);
+    }
+
+    get velocity() : Vector2 {
+        return this._velocity
+    }
+
+    get rotation() : number {
+        return ((this._rotation%360)+360)%360
     }
 }

@@ -18,8 +18,9 @@ const worldDimension = 100;
 const worldSize = new Vector2(worldDimension, worldDimension);
 const landerTexture = new Texture('assets/Lander.png', new Vector2(500, 500));
 const terrain = new Terrain(5, 15, new Vector2(0, 70), new Vector2(100, 70));
-terrain.insertSafeZone(10, 40, 15);
-terrain.insertSafeZone(60, 90, 15);
+const safeZones = [];
+safeZones.push(terrain.insertSafeZone(10, 40, 15));
+safeZones.push(terrain.insertSafeZone(60, 90, 15));
 console.log(terrain.points);
 
 // Virtual Sizing
@@ -43,21 +44,6 @@ function resize() {
 window.addEventListener('resize', resize);
 
 const lander = new Lander(new Vector2(worldSize.x / 2, 0), landerTexture, new Vector2(10, 10));
-
-// State Initialization
-let globalState: GlobalState = {
-    gravity: new Vector2(0, 1),
-    thrust: false,
-    turnLeft: false,
-    turnRight: false,
-    crashed: false,
-    fuel: 100,
-    fuelConsumption: 0.5,
-    thrustCoefficient: 10,
-    theta: 90,
-    terrain: terrain,
-    lander: lander
-};
 
 const drawables = new Array<Drawable<GlobalState>>();
 const ticking = new Array<Ticking<GlobalState>>();
@@ -87,6 +73,26 @@ commands.createCommand('beginTurnRight', (globalState) => {
 commands.createCommand('endTurnRight', (globalState) => {
     globalState.turnRight = false;
 })
+
+// State Initialization
+let globalState: GlobalState = {
+    thrust: false,
+    turnLeft: false,
+    turnRight: false,
+    crashed: false,
+    fuel: 100,
+    terrain,
+    lander,
+    safeZones,
+    commands,
+    keys,
+    config: {
+        fuelConsumption: 20,
+        thrustCoefficient: 10,
+        theta: 90,
+        gravity: new Vector2(0, 1),
+    }
+};
 
 // Default Keybindings
 keys.registerHandler(' ');
@@ -120,12 +126,55 @@ function update(delta: number, globalState: GlobalState) {
     }
 }
 
+let fuelPosition = new Vector2(5, 5);
+let anglePosition = new Vector2(5, 7.5);
+let velocityPosition = new Vector2(5, 10);
 function draw(globalState: GlobalState) {
     context.clearRect(0, 0, maxCoord, maxCoord);
     for (let i = 0; i < drawables.length; i++) {
         drawables[i].draw(context, globalState, vcs);
     }
     drawTerrain(context, terrain, vcs);
+    drawText(context);
+}
+
+function drawText(context: CanvasRenderingContext2D) {
+    let fontSize = vcs.translateValueX(2);
+    context.font = `${fontSize}px Arial`
+
+    // Fuel
+    let fuel = globalState.fuel;
+    if (fuel > 0) {
+        context.fillStyle = '#00ff00';
+    }
+    else {
+        context.fillStyle = '#ffffff';
+    }
+    let adjustedFuelPosition = vcs.translate(fuelPosition);
+    context.fillText(`Fuel: ${fuel.toFixed(2)}L`, adjustedFuelPosition.x, adjustedFuelPosition.y);
+
+    // Angle
+    let angle = globalState.lander.rotation;
+    if (angle < 5 || angle > 355) {
+        context.fillStyle = '#00ff00';
+    }
+    else {
+        context.fillStyle = '#ffffff';
+    }
+    let adjustedAnglePosition = vcs.translate(anglePosition);
+    context.fillText(`Angle: ${angle.toFixed(2)}°`, adjustedAnglePosition.x, adjustedAnglePosition.y);
+
+    // Velocity
+    let magn = globalState.lander.velocity.magnitude();
+    if (magn < 2) {
+        context.fillStyle = '#00ff00';
+    }
+    else {
+        context.fillStyle = '#ffffff';
+    }
+    let adjustedVelocityPosition = vcs.translate(velocityPosition);
+    context.fillText(`Velocity: ${magn.toFixed(2)} m/s`, adjustedVelocityPosition.x, adjustedVelocityPosition.y);
+    context.fillStyle = '#ffffff';
 }
 
 requestAnimationFrame(loop);

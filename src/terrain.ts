@@ -51,5 +51,6 @@ export class Terrain {
             point = this.points[i];
         }
         this.points[i] = new Vector2(x, saved.y);
+        return [saved, this.points[i]];
     }
 }
