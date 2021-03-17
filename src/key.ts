@@ -74,7 +74,6 @@ export class KeyManager {
     this.handlers.get(keyCode).addChanged(updateFn);
   }
   updateDown(event: KeyboardEvent) {
-    console.log(event.key);
     if (this.handlers.has(event.key)) {
       event.preventDefault();
       const handler = this.handlers.get(event.key);
