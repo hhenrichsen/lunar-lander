@@ -7,13 +7,6 @@ import Vector2 from './vector2';
 export interface GlobalState {
     // Rates
     config: GameConfig
-    // States
-    // TODO: Move into Lander.
-    crashed: boolean;
-    thrust: boolean;
-    fuel: number;
-    turnLeft: boolean;
-    turnRight: boolean;
     // Important Objects
     lander: Lander;
     terrain: Terrain;

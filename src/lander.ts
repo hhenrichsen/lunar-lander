@@ -43,6 +43,12 @@ export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
     private thrustEmitter: ParticleEmitter<GlobalState>;
     private _rotation: number;
 
+    fuel: number = 100;
+    crashed: boolean = false;
+    thrusting: boolean = false;
+    turningLeft: boolean = false;
+    turningRight: boolean = false;
+
     constructor(position: Vector2, texture: Texture, size: Vector2) {
         this.position = position;
         this.texture = texture;
@@ -82,7 +88,7 @@ export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
         context.stroke();
 
         // Debug velocity
-        let velo = coordinates.translate(this._velocity.normalize().scale(5));
+        let velocity = coordinates.translate(this._velocity.normalize().scale(5));
         context.beginPath();
         if (this._velocity.sqrMagnitude() < 4) {
             context.strokeStyle = "#0000ff";
@@ -91,38 +97,46 @@ export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
             context.strokeStyle = "#ff0000";
         }
         context.lineTo(adjPos.x, adjPos.y);
-        context.lineTo(adjPos.x + velo.x, adjPos.y + velo.y);
+        context.lineTo(adjPos.x + velocity.x, adjPos.y + velocity.y);
         context.stroke();
     }
 
     update(delta: number, state: GlobalState): void {
         if (!this.frozen) {
-            for (let i = 0; i < state.terrain.points.length - 1; i++) {
-                if(isColliding(new Circle(this.position, 4), state.terrain.points[i], state.terrain.points[i+1])) {
-                    this.frozen = true;
-                }
-            }
-            if (state.turnLeft && state.fuel > 0) {
+            if (this.turningLeft && this.fuel > 0) {
                 this.rotate(delta, state, -1);
             }
-            if (state.turnRight && state.fuel > 0) {
+            if (this.turningRight && this.fuel > 0) {
                 this.rotate(delta, state, 1);
             }
             this._velocity = this._velocity.add(state.config.gravity.scale(delta));
-            if (state.thrust && state.fuel > 0) {
+            if (this.thrusting && this.fuel > 0) {
                 this._velocity = this._velocity.add(this.thrustVector.scale(delta * state.config.thrustCoefficient));
-                state.fuel -= state.config.fuelConsumption * delta;
+                this.fuel -= state.config.fuelConsumption * delta;
             }
-            if (state.fuel < 0) {
-                state.fuel = 0;
+            if (this.fuel < 0) {
+                this.fuel = 0;
             }
             this.position = this.position.add(this._velocity.scale(delta));
             // this.thrustEmitter.update(delta, state);
+            for (let i = 0; i < state.terrain.points.length - 1; i++) {
+                if(isColliding(new Circle(this.position, 4), state.terrain.points[i], state.terrain.points[i+1])) {
+                    if (this.velocity.sqrMagnitude() <= 4 && (this.rotation < 5 || this.rotation > 355)) {
+                        for (let j = 0; j < state.safeZones.length; j++) {
+                            if (state.terrain.points[i] == state.safeZones[j][0] && state.terrain.points[i+1] == state.safeZones[j][1]) {
+                                state.commands.execute('safeLanding', state);
+                                return;
+                            }
+                        }
+                    }
+                    state.commands.execute('crashLanding', state);
+                }
+            }
         }
     }
 
     private rotate(delta: number, state: GlobalState, direction: number) {
-        state.fuel -= state.config.fuelConsumption * delta;
+        this.fuel -= state.config.fuelConsumption * delta;
         this._rotation += direction * state.config.theta * delta;
         this.thrustVector = this.thrustVector.rotate(direction * state.config.theta * delta);
     }
@@ -133,5 +147,10 @@ export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
 
     get rotation() : number {
         return ((this._rotation%360)+360)%360
+    }
+
+    public freeze() {
+        this.frozen = true;
+        this._velocity = Vector2.ZERO;
     }
 }

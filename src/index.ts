@@ -8,6 +8,7 @@ import { Lander } from './lander';
 import { KeyManager } from './key';
 import { CommandService } from "./command";
 import { drawTerrain, Terrain } from "./terrain";
+import { ConditionalDrawable } from "./conditionalDrawable";
 
 // General Setup
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
@@ -50,37 +51,52 @@ const ticking = new Array<Ticking<GlobalState>>();
 
 // Command Creation
 commands.createCommand('enableThrust', (globalState) => {
-    console.log("Thrust enabled...");
-    globalState.thrust = true;
+    console.log("Thrusting...")
+    globalState.lander.thrusting = true;
 });
 
 commands.createCommand('disableThrust', (globalState) => {
-    globalState.thrust = false;
+    globalState.lander.thrusting = false;
 })
 
 commands.createCommand('beginTurnLeft', (globalState) => {
-    globalState.turnLeft = true;
+    globalState.lander.turningLeft = true;
 })
 
 commands.createCommand('endTurnLeft', (globalState) => {
-    globalState.turnLeft = false;
+    globalState.lander.turningLeft = false;
 })
 
 commands.createCommand('beginTurnRight', (globalState) => {
-    globalState.turnRight = true;
+    globalState.lander.turningRight = true;
 })
 
 commands.createCommand('endTurnRight', (globalState) => {
-    globalState.turnRight = false;
+    globalState.lander.turningRight = false;
 })
+
+commands.createCommand('safeLanding', (globalState) => {
+    globalState.lander.freeze();
+})
+
+commands.createCommand('crashLanding', (globalState) => {
+    globalState.lander.crashed = true;
+    globalState.lander.freeze();
+})
+
+// Default Keybindings
+keys.registerHandler(' ');
+keys.registerHandler('q');
+keys.registerHandler('e');
+keys.bindDown(' ', () => commands.execute('enableThrust', globalState))
+keys.bindUp(' ', () => commands.execute('disableThrust', globalState))
+keys.bindDown('q', () => commands.execute('beginTurnLeft', globalState))
+keys.bindUp('q', () => commands.execute('endTurnLeft', globalState))
+keys.bindDown('e', () => commands.execute('beginTurnRight', globalState))
+keys.bindUp('e', () => commands.execute('endTurnRight', globalState))
 
 // State Initialization
 let globalState: GlobalState = {
-    thrust: false,
-    turnLeft: false,
-    turnRight: false,
-    crashed: false,
-    fuel: 100,
     terrain,
     lander,
     safeZones,
@@ -94,18 +110,7 @@ let globalState: GlobalState = {
     }
 };
 
-// Default Keybindings
-keys.registerHandler(' ');
-keys.registerHandler('q');
-keys.registerHandler('e');
-keys.bindDown(' ', () => commands.execute('enableThrust', globalState))
-keys.bindUp(' ', () => commands.execute('disableThrust', globalState))
-keys.bindDown('q', () => commands.execute('beginTurnLeft', globalState))
-keys.bindUp('q', () => commands.execute('endTurnLeft', globalState))
-keys.bindDown('e', () => commands.execute('beginTurnRight', globalState))
-keys.bindUp('e', () => commands.execute('endTurnRight', globalState))
-
-drawables.push(lander);
+drawables.push(new ConditionalDrawable<GlobalState>((state: GlobalState) => !state.lander.crashed, lander));
 ticking.push(lander);
 
 // Game loop
@@ -131,10 +136,10 @@ let anglePosition = new Vector2(5, 7.5);
 let velocityPosition = new Vector2(5, 10);
 function draw(globalState: GlobalState) {
     context.clearRect(0, 0, maxCoord, maxCoord);
+    drawTerrain(context, terrain, vcs);
     for (let i = 0; i < drawables.length; i++) {
         drawables[i].draw(context, globalState, vcs);
     }
-    drawTerrain(context, terrain, vcs);
     drawText(context);
 }
 
@@ -143,7 +148,7 @@ function drawText(context: CanvasRenderingContext2D) {
     context.font = `${fontSize}px Arial`
 
     // Fuel
-    let fuel = globalState.fuel;
+    let fuel = globalState.lander.fuel;
     if (fuel > 0) {
         context.fillStyle = '#00ff00';
     }
