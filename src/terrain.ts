@@ -9,8 +9,8 @@ export function drawTerrain(
 ) {
   ctx.beginPath();
   ctx.lineTo(vcs.translateValueX(0), vcs.translateValueY(100));
-  ctx.strokeStyle = "#ffffff";
-  ctx.fillStyle = "#ffffff";
+  ctx.strokeStyle = "#cccccc";
+  ctx.fillStyle = "#aaaaaa";
   for (let i = 1; i < terrain.points.length; i++) {
     let pt = vcs.translate(terrain.points[i]);
     ctx.lineTo(pt.x, pt.y);

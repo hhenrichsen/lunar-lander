@@ -39,10 +39,6 @@ class ThrustGenerator implements ParticleGenerator<GlobalState> {
   }
 }
 class ExplosionGenerator implements ParticleGenerator<GlobalState> {
-  constructor(rotationOffset: number = 0) {
-    this._rotationOffset = rotationOffset;
-  }
-
   private tex: Texture = new Texture("assets/Fire.png", new Vector2(32, 32));
   private _size: Vector2 = new Vector2(1, 1);
   texture(_: GlobalState): Texture {
@@ -98,26 +94,26 @@ export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
     this.thrustEmitter = new ParticleEmitter(
       new ThrustGenerator(),
       (state) => state.lander.thrusting && state.lander.fuel > 0,
-      0.05,
-      10
+      0.03,
+      5
     );
     this.leftRotationEmitter = new ParticleEmitter(
       new ThrustGenerator(90),
       (state) => state.lander.turningLeft && state.lander.fuel > 0,
-      0.05,
-      5
+      0.03,
+      3
     );
     this.rightRotationEmitter = new ParticleEmitter(
       new ThrustGenerator(-90),
       (state) => state.lander.turningRight && state.lander.fuel > 0,
-      0.05,
-      5
+      0.03,
+      3
     );
     this.explosionEmitter = new ParticleEmitter(
       new ExplosionGenerator(),
       (state) => this._isExploding,
-      0.1,
-      400
+      0.03,
+      200
     );
     this.positionEmitters();
   }
@@ -202,10 +198,12 @@ export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
 
   update(delta: number, state: GlobalState): void {
     if (this._isExploding) {
+        console.log("Explosion");
       this._explosionCount++;
     }
     if (this._explosionCount > 5) {
       this._isExploding = false;
+      this._explosionCount = 0;
     }
     this.thrustEmitter.update(delta, state);
     this.leftRotationEmitter.update(delta, state);
@@ -213,10 +211,10 @@ export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
     this.explosionEmitter.update(delta, state);
     if (!this.frozen) {
       if (this.turningLeft && this.fuel > 0) {
-        this.rotate(delta, state, 1);
+        this.rotate(delta, state, -1);
       }
       if (this.turningRight && this.fuel > 0) {
-        this.rotate(delta, state, -1);
+        this.rotate(delta, state, 1);
       }
       this._velocity = this._velocity.add(state.config.gravity.scale(delta));
       if (this.thrusting && this.fuel > 0) {
@@ -259,7 +257,7 @@ export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
         }
       }
 
-      if (this.position.x > 110 || this.position.x < -10) {
+      if (this.position.x > 110 || this.position.x < -10 || this.position.y > 120) {
         state.commands.execute("crashLanding", state);
         this._isExploding = true;
       }
