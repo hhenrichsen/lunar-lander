@@ -7,6 +7,9 @@ export class VirtualCoordinateSystem {
   constructor(scaleX: number, scaleY: number) {
     this.scaleX = scaleX;
     this.scaleY = scaleY;
+    this.translate = this.translate.bind(this);
+    this.translateValueX = this.translateValueX.bind(this);
+    this.translateValueY = this.translateValueY.bind(this);
   }
 
   translate(v1: Vector2): Vector2 {

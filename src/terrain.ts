@@ -23,10 +23,11 @@ export function drawTerrain(
   ctx.fillStyle = grd;
   ctx.fill();
 
-  for (let i = 1; i < state.safeZones.length; i++) {
+  for (let i = 0; i < state.safeZones.length; i++) {
+    ctx.strokeStyle = "#f69205"
+    ctx.lineWidth = vcs.translateValueY(0.5);
     ctx.beginPath();
-    ctx.fillStyle = "#f69205"
-    let [pt1, pt2] = state.safeZones[i];
+    let [pt1, pt2] = state.safeZones[i].map(vcs.translate);
     ctx.lineTo(pt1.x, pt1.y);
     ctx.lineTo(pt2.x, pt2.y);
     ctx.stroke();
