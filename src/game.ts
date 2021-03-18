@@ -84,7 +84,7 @@ function update (delta: number, globalState: GlobalState) {
 }
 function draw (globalState: GlobalState) {
   context.clearRect(0, 0, canvas.width, canvas.height);
-  drawTerrain(context, globalState.terrain, vcs, worldSize);
+  drawTerrain(context, globalState, vcs);
   for (let i = 0; i < drawables.length; i++) {
     drawables[i].draw(context, globalState, vcs);
   }
@@ -143,6 +143,7 @@ function buildCommands (state: GlobalState): CommandService<GlobalState> {
   const commands = new CommandService<GlobalState>()
   // Command Creation
   commands.createCommand('beginThrust', globalState => {
+    if (globalState.lander.frozen) return;
     globalState.lander.thrusting = true
     if (globalState.lander.fuel > 0) {
       globalState.sounds.mainThruster.play()
@@ -158,6 +159,7 @@ function buildCommands (state: GlobalState): CommandService<GlobalState> {
   })
 
   commands.createCommand('fuelExpired', globalState => {
+    if (globalState.lander.frozen) return;
     if (globalState.sounds.mainThruster.playing) {
       globalState.sounds.mainThruster.stop()
       globalState.sounds.noFuel.play()
@@ -169,6 +171,7 @@ function buildCommands (state: GlobalState): CommandService<GlobalState> {
   })
 
   commands.createCommand('beginTurnLeft', globalState => {
+    if (globalState.lander.frozen) return;
     globalState.lander.turningLeft = true
     if (globalState.lander.fuel > 0) {
       globalState.sounds.subThruster.play()
@@ -178,12 +181,14 @@ function buildCommands (state: GlobalState): CommandService<GlobalState> {
   })
 
   commands.createCommand('endTurnLeft', globalState => {
+    if (globalState.lander.frozen) return;
     globalState.sounds.subThruster.stop()
     globalState.sounds.noFuel.stop()
     globalState.lander.turningLeft = false
   })
 
   commands.createCommand('beginTurnRight', globalState => {
+    if (globalState.lander.frozen) return;
     if (globalState.lander.fuel > 0) {
       globalState.sounds.subThruster.play()
     } else {
@@ -193,6 +198,7 @@ function buildCommands (state: GlobalState): CommandService<GlobalState> {
   })
 
   commands.createCommand('endTurnRight', globalState => {
+    if (globalState.lander.frozen) return;
     globalState.sounds.subThruster.stop()
     globalState.sounds.noFuel.stop()
     globalState.lander.turningRight = false
@@ -208,6 +214,9 @@ function buildCommands (state: GlobalState): CommandService<GlobalState> {
   })
 
   commands.createCommand('crashLanding', globalState => {
+    globalState.sounds.mainThruster.stop();
+    globalState.sounds.subThruster.stop();
+    globalState.sounds.noFuel.stop();
     globalState.sounds.explosion.play()
     globalState.lander.crashed = true
     globalState.lander.freeze()

@@ -65,7 +65,7 @@ class ExplosionGenerator implements ParticleGenerator<GlobalState> {
 export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
   private size: Vector2
   private texture: Texture
-  private frozen: boolean
+  private _frozen: boolean
   private thrustEmitter: ParticleEmitter<GlobalState>
   private leftRotationEmitter: ParticleEmitter<GlobalState>
   private rightRotationEmitter: ParticleEmitter<GlobalState>
@@ -86,26 +86,26 @@ export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
   constructor (position: Vector2, texture: Texture, size: Vector2) {
     this.texture = texture
     this.size = size
-    this.frozen = false
+    this._frozen = false
     this._position = position
     this._velocity = new Vector2(0, 0)
     this._rotationVector = new Vector2(0, -1)
     this._rotation = 0
     this.thrustEmitter = new ParticleEmitter(
       new ThrustGenerator(),
-      state => state.lander.thrusting && state.lander.fuel > 0,
+      state => state.lander.thrusting && state.lander.fuel > 0 && !this._frozen,
       0.03,
       5
     )
     this.leftRotationEmitter = new ParticleEmitter(
       new ThrustGenerator(90),
-      state => state.lander.turningLeft && state.lander.fuel > 0,
+      state => state.lander.turningLeft && state.lander.fuel > 0 && !this._frozen,
       0.03,
       3
     )
     this.rightRotationEmitter = new ParticleEmitter(
       new ThrustGenerator(-90),
-      state => state.lander.turningRight && state.lander.fuel > 0,
+      state => state.lander.turningRight && state.lander.fuel > 0 && !this._frozen,
       0.03,
       3
     )
@@ -209,7 +209,7 @@ export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
     this.leftRotationEmitter.update(delta, state)
     this.rightRotationEmitter.update(delta, state)
     this.explosionEmitter.update(delta, state)
-    if (!this.frozen) {
+    if (!this._frozen) {
       if (this.turningLeft && this.fuel > 0) {
         this.rotate(delta, state, -1)
       }
@@ -293,7 +293,11 @@ export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
   }
 
   public freeze () {
-    this.frozen = true
+    this._frozen = true
     this._velocity = Vector2.ZERO
+  }
+
+  public get frozen() {
+      return this._frozen;
   }
 }

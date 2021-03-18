@@ -1,28 +1,36 @@
 import Vector2 from "./vector2";
 import { random } from "./random";
 import { CoordinateTranslatable } from "./coordinate";
+import { GlobalState } from "./state";
 
 export function drawTerrain(
   ctx: CanvasRenderingContext2D,
-  terrain: Terrain,
+  state: GlobalState,
   vcs: CoordinateTranslatable,
-  constraint: Vector2
 ) {
   ctx.beginPath();
-  ctx.lineTo(vcs.translateValueX(0), vcs.translateValueY(constraint.y));
+  ctx.lineTo(vcs.translateValueX(0), vcs.translateValueY(state.config.worldSize.y));
 
   var grd = ctx.createLinearGradient(0, 0, 0, 1000);
-  grd.addColorStop(0, "#999999");
-  grd.addColorStop(1, "#cccccc");
-  ctx.fillStyle = grd;
+  grd.addColorStop(0, "#ffffff");
+  grd.addColorStop(1, "#777777");
 
-  for (let i = 1; i < terrain.points.length; i++) {
-    let pt = vcs.translate(terrain.points[i]);
+  for (let i = 1; i < state.terrain.points.length; i++) {
+    let pt = vcs.translate(state.terrain.points[i]);
     ctx.lineTo(pt.x, pt.y);
   }
-  ctx.lineTo(vcs.translateValueX(constraint.x), vcs.translateValueY(constraint.y));
-  ctx.fillStyle = "#ffffff";
+  ctx.lineTo(vcs.translateValueX(state.config.worldSize.x), vcs.translateValueY(state.config.worldSize.y));
+  ctx.fillStyle = grd;
   ctx.fill();
+
+  for (let i = 1; i < state.safeZones.length; i++) {
+    ctx.beginPath();
+    ctx.fillStyle = "#f69205"
+    let [pt1, pt2] = state.safeZones[i];
+    ctx.lineTo(pt1.x, pt1.y);
+    ctx.lineTo(pt2.x, pt2.y);
+    ctx.stroke();
+  }
 }
 
 export class Terrain {
