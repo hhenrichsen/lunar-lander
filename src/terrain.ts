@@ -10,13 +10,18 @@ export function drawTerrain(
 ) {
   ctx.beginPath();
   ctx.lineTo(vcs.translateValueX(0), vcs.translateValueY(constraint.y));
-  ctx.strokeStyle = "#cccccc";
-  ctx.fillStyle = "#aaaaaa";
+
+  var grd = ctx.createLinearGradient(0, 0, 0, 1000);
+  grd.addColorStop(0, "#999999");
+  grd.addColorStop(1, "#cccccc");
+  ctx.fillStyle = grd;
+
   for (let i = 1; i < terrain.points.length; i++) {
     let pt = vcs.translate(terrain.points[i]);
     ctx.lineTo(pt.x, pt.y);
   }
   ctx.lineTo(vcs.translateValueX(constraint.x), vcs.translateValueY(constraint.y));
+  ctx.fillStyle = "#ffffff";
   ctx.fill();
 }
 

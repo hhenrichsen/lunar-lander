@@ -17,7 +17,7 @@ class ThrustGenerator implements ParticleGenerator<GlobalState> {
   }
 
   private tex: Texture = new Texture('assets/Smoke.png', new Vector2(32, 32))
-  private _size: Vector2 = new Vector2(0.75, 0.75)
+  private _size: Vector2 = new Vector2(0.425, 0.425)
   texture (_: GlobalState): Texture {
     return this.tex
   }
@@ -40,7 +40,7 @@ class ThrustGenerator implements ParticleGenerator<GlobalState> {
 }
 class ExplosionGenerator implements ParticleGenerator<GlobalState> {
   private tex: Texture = new Texture('assets/Fire.png', new Vector2(32, 32))
-  private _size: Vector2 = new Vector2(1, 1)
+  private _size: Vector2 = new Vector2(0.425, 0.425)
   texture (_: GlobalState): Texture {
     return this.tex
   }
@@ -185,13 +185,13 @@ export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
 
   positionEmitters (): void {
     this.thrustEmitter.position = this._position.add(
-      this._rotationVector.scale(-3)
+      this._rotationVector.scale(-1.5)
     )
     this.leftRotationEmitter.position = this._position.add(
-      this._rotationVector.rotate(70).scale(-3.5)
+      this._rotationVector.rotate(70).scale(-1.75)
     )
     this.rightRotationEmitter.position = this._position.add(
-      this._rotationVector.rotate(-70).scale(-3.5)
+      this._rotationVector.rotate(-70).scale(-1.75)
     )
     this.explosionEmitter.position = this._position
   }
@@ -233,7 +233,7 @@ export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
       for (let i = 0; i < state.terrain.points.length - 1; i++) {
         if (
           isColliding(
-            new Circle(this._position, 4),
+            new Circle(this._position, 2),
             state.terrain.points[i],
             state.terrain.points[i + 1]
           )

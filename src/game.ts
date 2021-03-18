@@ -255,7 +255,7 @@ export function start (globalState: GlobalState, difficulty: number = 1) {
   const lander = new Lander(
     new Vector2(worldSize.x / 2, 0),
     landerTexture,
-    new Vector2(10, 10)
+    new Vector2(5, 5)
   )
   globalState.lander = lander
   drawables.push(lander)
