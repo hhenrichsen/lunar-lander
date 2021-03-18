@@ -5,7 +5,7 @@ import Ticking from './ticking'
 import { VirtualCoordinateSystem } from './coordinate'
 import { GlobalState } from './state'
 import { Lander } from './lander'
-import { KeyManager } from './key'
+import { KeyManager, mapToCommands } from './key'
 import { CommandService } from './command'
 import { drawTerrain, Terrain } from './terrain'
 import { ConditionalDrawable } from './conditionalDrawable'
@@ -85,12 +85,12 @@ function update (delta: number, globalState: GlobalState) {
   }
 }
 function draw (globalState: GlobalState) {
-  context.clearRect(0, 0, maxCoord, maxCoord)
-  drawTerrain(context, globalState.terrain, vcs, worldSize)
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  drawTerrain(context, globalState.terrain, vcs, worldSize);
   for (let i = 0; i < drawables.length; i++) {
-    drawables[i].draw(context, globalState, vcs)
+    drawables[i].draw(context, globalState, vcs);
   }
-  drawText(context, globalState)
+  drawText(context, globalState);
 }
 
 function drawText (context: CanvasRenderingContext2D, globalState: GlobalState) {
@@ -217,15 +217,9 @@ function buildCommands (state: GlobalState): CommandService<GlobalState> {
 function buildKeys (state: GlobalState): KeyManager {
   // Default Keybindings
   const keys = new KeyManager()
-  keys.registerHandler('ArrowUp')
-  keys.registerHandler('ArrowLeft')
-  keys.registerHandler('ArrowRight')
-  keys.bindDown('ArrowUp', () => state.commands.execute('beginThrust', state))
-  keys.bindUp('ArrowUp', () => state.commands.execute('endThrust', state))
-  keys.bindDown('ArrowLeft', () => state.commands.execute('beginTurnLeft', state))
-  keys.bindUp('ArrowLeft', () => state.commands.execute('endTurnLeft', state))
-  keys.bindDown('ArrowRight', () => state.commands.execute('beginTurnRight', state))
-  keys.bindUp('ArrowRight', () => state.commands.execute('endTurnRight', state))
+  mapToCommands(keys, state.commands, 'Thrust', 'ArrowUp', state);
+  mapToCommands(keys, state.commands, 'TurnLeft', 'ArrowLeft', state);
+  mapToCommands(keys, state.commands, 'TurnRight', 'ArrowRight', state);
   return keys
 }
 
@@ -241,7 +235,8 @@ export function buildState (): GlobalState {
       fuelConsumption: 20,
       thrustCoefficient: 10,
       theta: 90,
-      gravity: new Vector2(0, 1)
+      gravity: new Vector2(0, 1),
+      worldSize
     },
     sounds: {
       mainThruster: new SoundEffect('assets/mainthruster.wav', 4),
@@ -269,7 +264,7 @@ export function start (globalState: GlobalState, difficulty: number = 1) {
   const safeZones: Array<Array<Vector2>> = []
   const count = 3 - difficulty;
   const min = 10;
-  const max = 90;
+  const max = worldSize.x - 10;
   const validPortions = (max - min) / count;
   for (let i = 0; i < count; i++) {
     safeZones.push(terrain.insertSafeZone(min + validPortions * i, min + validPortions * (i + 1), count * 7.5));

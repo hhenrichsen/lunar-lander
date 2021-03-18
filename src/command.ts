@@ -30,6 +30,10 @@ export class CommandService<T> {
     this.commands.set(name, new Command(name, action));
   }
 
+  public has(name: string): boolean {
+      return this.commands.has(name);
+  }
+
   public execute(name: string, state: T): void {
     if (this.commands.has(name)) {
       this.commands.get(name).invoke(state);

@@ -1,3 +1,5 @@
+import { CommandService } from "./command";
+
 interface Modifiers {
   alt: boolean;
   shift: boolean;
@@ -109,4 +111,17 @@ export class KeyManager {
     window.addEventListener("keyup", this.updateUp.bind(this));
     this.handlers = new Map<string, KeyHandler>();
   }
+}
+
+export function mapToCommands<T>(keyManager: KeyManager, commands: CommandService<T>, commandName: string, keyName: string, state: T) {
+    keyManager.registerHandler(keyName, commandName);
+    if (commands.has(`begin${commandName}`)) {
+        keyManager.bindDown(keyName, () => commands.execute(`begin${commandName}`, state));
+    }
+    if (commands.has(`end${commandName}`)) {
+        keyManager.bindUp(keyName, () => commands.execute(`end${commandName}`, state));
+    }
+    if (commands.has(`toggle${commandName}`)) {
+        keyManager.bindChanged(keyName, () => commands.execute(`toggle${commandName}`, state));
+    }
 }

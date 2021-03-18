@@ -32,4 +32,5 @@ export interface GameConfig {
   thrustCoefficient: number; // u / second
   fuelConsumption: number; // fuel / second
   theta: number; // degrees / second
+  worldSize: Vector2
 }
