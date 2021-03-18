@@ -55,7 +55,7 @@ class ExplosionGenerator implements ParticleGenerator<GlobalState> {
     return v
   }
   lifetime (state: GlobalState): number {
-    return 5 + random.gaussian(12)
+    return 2 + random.gaussian(12)
   }
   rotation (state: GlobalState): number {
     return 0
