@@ -5,17 +5,18 @@ import { CoordinateTranslatable } from "./coordinate";
 export function drawTerrain(
   ctx: CanvasRenderingContext2D,
   terrain: Terrain,
-  vcs: CoordinateTranslatable
+  vcs: CoordinateTranslatable,
+  constraint: Vector2
 ) {
   ctx.beginPath();
-  ctx.lineTo(vcs.translateValueX(0), vcs.translateValueY(100));
+  ctx.lineTo(vcs.translateValueX(0), vcs.translateValueY(constraint.y));
   ctx.strokeStyle = "#cccccc";
   ctx.fillStyle = "#aaaaaa";
   for (let i = 1; i < terrain.points.length; i++) {
     let pt = vcs.translate(terrain.points[i]);
     ctx.lineTo(pt.x, pt.y);
   }
-  ctx.lineTo(vcs.translateValueX(100), vcs.translateValueY(100));
+  ctx.lineTo(vcs.translateValueX(constraint.x), vcs.translateValueY(constraint.y));
   ctx.fill();
 }
 

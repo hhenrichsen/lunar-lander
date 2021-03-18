@@ -14,29 +14,41 @@ import { SoundEffect } from './sound'
 // General Setup
 const canvas = document.getElementById('canvas') as HTMLCanvasElement
 const context = canvas.getContext('2d')
-const worldDimension = 100
-const worldSize = new Vector2(worldDimension, worldDimension)
+const worldSize = new Vector2(130, 100);
 const landerTexture = new Texture('assets/Lander.png', new Vector2(500, 500))
 
 // Virtual Sizing
 let maxCoord = Math.min(window.innerWidth, window.innerHeight)
-canvas.width = maxCoord
-canvas.height = maxCoord
-let vcs = new VirtualCoordinateSystem(
-  maxCoord / worldSize.x,
-  maxCoord / worldSize.y
-)
+  if (maxCoord == window.innerWidth) {
+    canvas.width = maxCoord
+    canvas.height = maxCoord * (3/4)
+  }
+  else {
+    canvas.width = maxCoord * 4/3
+    canvas.height = maxCoord
+  }
+
+  let vcs = new VirtualCoordinateSystem(
+    canvas.width / worldSize.x,
+    canvas.height / worldSize.y
+  )
 
 // Resize
 function resize () {
   maxCoord = Math.min(window.innerWidth, window.innerHeight)
 
-  canvas.width = maxCoord
-  canvas.height = maxCoord
+  if (maxCoord == window.innerWidth) {
+    canvas.width = maxCoord
+    canvas.height = maxCoord * (3/4)
+  }
+  else {
+    canvas.width = maxCoord * 4/3
+    canvas.height = maxCoord
+  }
 
   vcs = new VirtualCoordinateSystem(
-    maxCoord / worldSize.x,
-    maxCoord / worldSize.y
+    canvas.width / worldSize.x,
+    canvas.height / worldSize.y
   )
   console.log(`Resizing to ${maxCoord}px.`)
 }
@@ -74,7 +86,7 @@ function update (delta: number, globalState: GlobalState) {
 }
 function draw (globalState: GlobalState) {
   context.clearRect(0, 0, maxCoord, maxCoord)
-  drawTerrain(context, globalState.terrain, vcs)
+  drawTerrain(context, globalState.terrain, vcs, worldSize)
   for (let i = 0; i < drawables.length; i++) {
     drawables[i].draw(context, globalState, vcs)
   }
@@ -132,7 +144,7 @@ function drawText (context: CanvasRenderingContext2D, globalState: GlobalState) 
 function buildCommands (state: GlobalState): CommandService<GlobalState> {
   const commands = new CommandService<GlobalState>()
   // Command Creation
-  commands.createCommand('enableThrust', globalState => {
+  commands.createCommand('beginThrust', globalState => {
     globalState.lander.thrusting = true
     if (globalState.lander.fuel > 0) {
       globalState.sounds.mainThruster.play()
@@ -141,7 +153,7 @@ function buildCommands (state: GlobalState): CommandService<GlobalState> {
     }
   })
 
-  commands.createCommand('disableThrust', globalState => {
+  commands.createCommand('endThrust', globalState => {
     globalState.lander.thrusting = false
     globalState.sounds.mainThruster.stop()
     globalState.sounds.noFuel.stop()
@@ -208,8 +220,8 @@ function buildKeys (state: GlobalState): KeyManager {
   keys.registerHandler('ArrowUp')
   keys.registerHandler('ArrowLeft')
   keys.registerHandler('ArrowRight')
-  keys.bindDown('ArrowUp', () => state.commands.execute('enableThrust', state))
-  keys.bindUp('ArrowUp', () => state.commands.execute('disableThrust', state))
+  keys.bindDown('ArrowUp', () => state.commands.execute('beginThrust', state))
+  keys.bindUp('ArrowUp', () => state.commands.execute('endThrust', state))
   keys.bindDown('ArrowLeft', () => state.commands.execute('beginTurnLeft', state))
   keys.bindUp('ArrowLeft', () => state.commands.execute('endTurnLeft', state))
   keys.bindDown('ArrowRight', () => state.commands.execute('beginTurnRight', state))
@@ -253,7 +265,7 @@ export function start (globalState: GlobalState, difficulty: number = 1) {
   globalState.lander = lander
   drawables.push(lander)
   ticking.push(lander)
-  const terrain = new Terrain(8, 100, new Vector2(0, 50), new Vector2(100, 50))
+  const terrain = new Terrain(8, 100, new Vector2(0, worldSize.y / 2), new Vector2(worldSize.x, worldSize.y / 2))
   const safeZones: Array<Array<Vector2>> = []
   const count = 3 - difficulty;
   const min = 10;
