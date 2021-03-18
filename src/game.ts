@@ -14,18 +14,19 @@ import { SoundEffect } from './sound'
 // General Setup
 const canvas = document.getElementById('canvas') as HTMLCanvasElement
 const context = canvas.getContext('2d')
-const worldSize = new Vector2(130, 100);
+const ratio = new Vector2(4/3, 1);
+const worldSize = ratio.scale(100);
+
 const landerTexture = new Texture('assets/Lander.png', new Vector2(500, 500))
 
 // Virtual Sizing
-let maxCoord = Math.min(window.innerWidth, window.innerHeight)
-  if (maxCoord == window.innerWidth) {
-    canvas.width = maxCoord
-    canvas.height = maxCoord * (3/4)
+  if (window.innerWidth / ratio.x < window.innerHeight / ratio.y) {
+    canvas.width = window.innerWidth
+    canvas.height = window.innerWidth * ratio.y / ratio.x
   }
   else {
-    canvas.width = maxCoord * 4/3
-    canvas.height = maxCoord
+    canvas.width = window.innerHeight * ratio.x / ratio.y
+    canvas.height = window.innerHeight
   }
 
   let vcs = new VirtualCoordinateSystem(
@@ -35,28 +36,25 @@ let maxCoord = Math.min(window.innerWidth, window.innerHeight)
 
 // Resize
 function resize () {
-  maxCoord = Math.min(window.innerWidth, window.innerHeight)
-
-  if (maxCoord == window.innerWidth) {
-    canvas.width = maxCoord
-    canvas.height = maxCoord * (3/4)
+  if (window.innerWidth / ratio.x < window.innerHeight / ratio.y) {
+    canvas.width = window.innerWidth
+    canvas.height = window.innerWidth * ratio.y / ratio.x
   }
   else {
-    canvas.width = maxCoord * 4/3
-    canvas.height = maxCoord
+    canvas.width = window.innerHeight * ratio.x / ratio.y
+    canvas.height = window.innerHeight
   }
 
   vcs = new VirtualCoordinateSystem(
     canvas.width / worldSize.x,
     canvas.height / worldSize.y
   )
-  console.log(`Resizing to ${maxCoord}px.`)
 }
 
 window.addEventListener('resize', resize);
 
-const drawables = new Array<Drawable<GlobalState>>()
-const ticking = new Array<Ticking<GlobalState>>()
+let drawables = new Array<Drawable<GlobalState>>()
+let ticking = new Array<Ticking<GlobalState>>()
 
 let fuelPosition = new Vector2(5, 5)
 let anglePosition = new Vector2(5, 7.5)
@@ -203,6 +201,10 @@ function buildCommands (state: GlobalState): CommandService<GlobalState> {
   commands.createCommand('safeLanding', globalState => {
     globalState.sounds.landing.play()
     globalState.lander.freeze()
+    setTimeout(() => {
+        globalState.running = false
+        start(buildState(), 2);
+    }, 3000);
   })
 
   commands.createCommand('crashLanding', globalState => {
@@ -258,6 +260,8 @@ export function start (globalState: GlobalState, difficulty: number = 1) {
     new Vector2(5, 5)
   )
   globalState.lander = lander
+  drawables = [];
+  ticking = [];
   drawables.push(lander)
   ticking.push(lander)
   const terrain = new Terrain(8, 100, new Vector2(0, worldSize.y / 2), new Vector2(worldSize.x, worldSize.y / 2))
