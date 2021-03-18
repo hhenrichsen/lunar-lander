@@ -6,7 +6,7 @@ class Random {
       rand += Math.random();
     }
 
-    return rand / count;
+    return rand / count - 0.5;
   }
 }
 

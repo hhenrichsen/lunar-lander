@@ -26,7 +26,7 @@ class ThrustGenerator implements ParticleGenerator<GlobalState> {
   }
   velocity (state: GlobalState): Vector2 {
     let v = state.lander.rotationVector
-    let rotation = random.gaussian(12) * 100 - 50
+    let rotation = random.gaussian(12) * 100
     v = v.rotate(rotation + this._rotationOffset)
     v = v.scale(-5 * random.gaussian(12))
     return v

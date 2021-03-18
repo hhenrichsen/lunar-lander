@@ -264,7 +264,7 @@ export function start (globalState: GlobalState, difficulty: number = 1) {
   ticking = [];
   drawables.push(lander)
   ticking.push(lander)
-  const terrain = new Terrain(8, 100, new Vector2(0, worldSize.y / 2), new Vector2(worldSize.x, worldSize.y / 2))
+  const terrain = new Terrain(8, 500, new Vector2(0, worldSize.y * 2 / 3), new Vector2(worldSize.x, worldSize.y * 2 / 3))
   const safeZones: Array<Array<Vector2>> = []
   const count = 3 - difficulty;
   const min = 10;
