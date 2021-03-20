@@ -3,7 +3,7 @@ import { drawTexture, Texture } from './texture'
 import Drawable from './drawable'
 import Ticking from './ticking'
 import { VirtualCoordinateSystem } from './coordinate'
-import { GlobalState } from './state'
+import { GlobalState, PlayState } from './state'
 import { Lander } from './lander'
 import { KeyManager, mapToCommands } from './key'
 import { CommandService } from './command'
@@ -53,56 +53,56 @@ function resize () {
 
 window.addEventListener('resize', resize);
 
-let drawables = new Array<Drawable<GlobalState>>()
-let ticking = new Array<Ticking<GlobalState>>()
+let drawables = new Array<Drawable<GlobalState<PlayState>>>()
+let ticking = new Array<Ticking<GlobalState<PlayState>>>()
 
-let fuelPosition = new Vector2(5, 5)
-let anglePosition = new Vector2(5, 7.5)
-let velocityPosition = new Vector2(5, 10)
+const fuelPosition = new Vector2(5, 5)
+const anglePosition = new Vector2(5, 7.5)
+const velocityPosition = new Vector2(5, 10)
 
 // Game loop
-let lastTime: number = 0
-function loop (globalState: GlobalState) : FrameRequestCallback {
-    let fn = function(currentTime: number) {
+let lastTime = 0
+function loop (state: GlobalState<PlayState>) : FrameRequestCallback {
+    const fn = function(currentTime: number) {
         const delta = currentTime - lastTime
         lastTime = currentTime
 
-        update(delta / 1000, globalState)
-        draw(globalState)
+        update(delta / 1000, state)
+        draw(state)
 
-        if (globalState.running) {
+        if (state.localState.running) {
             requestAnimationFrame(fn);
         }
     }
     return fn
 }
 
-function update (delta: number, globalState: GlobalState) {
+function update (delta: number, state: GlobalState<PlayState>) {
   for (let i = 0; i < ticking.length; i++) {
-    ticking[i].update(delta, globalState)
+    ticking[i].update(delta, state)
   }
 }
-function draw (globalState: GlobalState) {
+function draw (state: GlobalState<PlayState>) {
   context.clearRect(0, 0, canvas.width, canvas.height);
-  drawTerrain(context, globalState, vcs);
+  drawTerrain(context, state, vcs);
   for (let i = 0; i < drawables.length; i++) {
-    drawables[i].draw(context, globalState, vcs);
+    drawables[i].draw(context, state, vcs);
   }
-  drawText(context, globalState);
+  drawText(context, state);
 }
 
-function drawText (context: CanvasRenderingContext2D, globalState: GlobalState) {
-  let fontSize = vcs.translateValueX(2)
+function drawText (context: CanvasRenderingContext2D, state: GlobalState<PlayState>) {
+  const fontSize = vcs.translateValueX(2)
   context.font = `${fontSize}px Arial`
 
   // Fuel
-  let fuel = globalState.lander.fuel
+  const fuel = state.localState.lander.fuel
   if (fuel > 0) {
     context.fillStyle = '#00ff00'
   } else {
     context.fillStyle = '#ffffff'
   }
-  let adjustedFuelPosition = vcs.translate(fuelPosition)
+  const adjustedFuelPosition = vcs.translate(fuelPosition)
   context.fillText(
     `Fuel: ${fuel.toFixed(2)}L`,
     adjustedFuelPosition.x,
@@ -110,13 +110,13 @@ function drawText (context: CanvasRenderingContext2D, globalState: GlobalState) 
   )
 
   // Angle
-  let angle = globalState.lander.rotation
+  const angle = state.localState.lander.rotation
   if (angle < 5 || angle > 355) {
     context.fillStyle = '#00ff00'
   } else {
     context.fillStyle = '#ffffff'
   }
-  let adjustedAnglePosition = vcs.translate(anglePosition)
+  const adjustedAnglePosition = vcs.translate(anglePosition)
   context.fillText(
     `Angle: ${angle.toFixed(2)}°`,
     adjustedAnglePosition.x,
@@ -124,13 +124,13 @@ function drawText (context: CanvasRenderingContext2D, globalState: GlobalState) 
   )
 
   // Velocity
-  let magn = globalState.lander.velocity.magnitude()
+  const magn = state.localState.lander.velocity.magnitude()
   if (magn < 2) {
     context.fillStyle = '#00ff00'
   } else {
     context.fillStyle = '#ffffff'
   }
-  let adjustedVelocityPosition = vcs.translate(velocityPosition)
+  const adjustedVelocityPosition = vcs.translate(velocityPosition)
   context.fillText(
     `Velocity: ${magn.toFixed(2)} m/s`,
     adjustedVelocityPosition.x,
@@ -139,93 +139,93 @@ function drawText (context: CanvasRenderingContext2D, globalState: GlobalState) 
   context.fillStyle = '#ffffff'
 }
 
-function buildCommands (state: GlobalState): CommandService<GlobalState> {
-  const commands = new CommandService<GlobalState>()
+function buildCommands (state: GlobalState<PlayState>): CommandService<GlobalState<PlayState>> {
+  const commands = new CommandService<GlobalState<PlayState>>()
   // Command Creation
-  commands.createCommand('beginThrust', globalState => {
-    if (globalState.lander.frozen) return;
-    globalState.lander.thrusting = true
-    if (globalState.lander.fuel > 0) {
-      globalState.sounds.mainThruster.play()
+  commands.createCommand('beginThrust', state => {
+    if (state.localState.lander.frozen) return;
+    state.localState.lander.thrusting = true
+    if (state.localState.lander.fuel > 0) {
+      state.sounds.mainThruster.play()
     } else {
-      globalState.sounds.noFuel.play()
+      state.sounds.noFuel.play()
     }
   })
 
-  commands.createCommand('endThrust', globalState => {
-    globalState.lander.thrusting = false
-    globalState.sounds.mainThruster.stop()
-    globalState.sounds.noFuel.stop()
+  commands.createCommand('endThrust', state => {
+    state.localState.lander.thrusting = false
+    state.sounds.mainThruster.stop()
+    state.sounds.noFuel.stop()
   })
 
-  commands.createCommand('fuelExpired', globalState => {
-    if (globalState.lander.frozen) return;
-    if (globalState.sounds.mainThruster.playing) {
-      globalState.sounds.mainThruster.stop()
-      globalState.sounds.noFuel.play()
+  commands.createCommand('fuelExpired', state => {
+    if (state.localState.lander.frozen) return;
+    if (state.sounds.mainThruster.playing) {
+      state.sounds.mainThruster.stop()
+      state.sounds.noFuel.play()
     }
-    if (globalState.sounds.subThruster.playing) {
-      globalState.sounds.subThruster.stop()
-      globalState.sounds.noFuel.play()
+    if (state.sounds.subThruster.playing) {
+      state.sounds.subThruster.stop()
+      state.sounds.noFuel.play()
     }
   })
 
-  commands.createCommand('beginTurnLeft', globalState => {
-    if (globalState.lander.frozen) return;
-    globalState.lander.turningLeft = true
-    if (globalState.lander.fuel > 0) {
-      globalState.sounds.subThruster.play()
+  commands.createCommand('beginTurnLeft', state => {
+    if (state.localState.lander.frozen) return;
+    state.localState.lander.turningLeft = true
+    if (state.localState.lander.fuel > 0) {
+      state.sounds.subThruster.play()
     } else {
-      globalState.sounds.noFuel.play()
+      state.sounds.noFuel.play()
     }
   })
 
-  commands.createCommand('endTurnLeft', globalState => {
-    if (globalState.lander.frozen) return;
-    globalState.sounds.subThruster.stop()
-    globalState.sounds.noFuel.stop()
-    globalState.lander.turningLeft = false
+  commands.createCommand('endTurnLeft', state => {
+    if (state.localState.lander.frozen) return;
+    state.sounds.subThruster.stop()
+    state.sounds.noFuel.stop()
+    state.localState.lander.turningLeft = false
   })
 
-  commands.createCommand('beginTurnRight', globalState => {
-    if (globalState.lander.frozen) return;
-    if (globalState.lander.fuel > 0) {
-      globalState.sounds.subThruster.play()
+  commands.createCommand('beginTurnRight', state => {
+    if (state.localState.lander.frozen) return;
+    if (state.localState.lander.fuel > 0) {
+      state.sounds.subThruster.play()
     } else {
-      globalState.sounds.noFuel.play()
+      state.sounds.noFuel.play()
     }
-    globalState.lander.turningRight = true
+    state.localState.lander.turningRight = true
   })
 
-  commands.createCommand('endTurnRight', globalState => {
-    if (globalState.lander.frozen) return;
-    globalState.sounds.subThruster.stop()
-    globalState.sounds.noFuel.stop()
-    globalState.lander.turningRight = false
+  commands.createCommand('endTurnRight', state => {
+    if (state.localState.lander.frozen) return;
+    state.sounds.subThruster.stop()
+    state.sounds.noFuel.stop()
+    state.localState.lander.turningRight = false
   })
 
-  commands.createCommand('safeLanding', globalState => {
-    globalState.sounds.landing.play()
-    globalState.lander.freeze()
+  commands.createCommand('safeLanding', state => {
+    state.sounds.landing.play()
+    state.localState.lander.freeze()
     setTimeout(() => {
-        globalState.running = false
+        state.localState.running = false
         start(buildState(), 2);
     }, 3000);
   })
 
-  commands.createCommand('crashLanding', globalState => {
-    globalState.sounds.mainThruster.stop();
-    globalState.sounds.subThruster.stop();
-    globalState.sounds.noFuel.stop();
-    globalState.sounds.explosion.play()
-    globalState.lander.crashed = true
-    globalState.lander.freeze()
+  commands.createCommand('crashLanding', state => {
+    state.sounds.mainThruster.stop();
+    state.sounds.subThruster.stop();
+    state.sounds.noFuel.stop();
+    state.sounds.explosion.play()
+    state.localState.lander.crashed = true
+    state.localState.lander.freeze()
   })
 
   return commands;
 }
 
-function buildKeys (state: GlobalState): KeyManager {
+function buildKeys (state: GlobalState<PlayState>): KeyManager {
   // Default Keybindings
   const keys = new KeyManager()
   mapToCommands(keys, state.commands, 'Thrust', 'ArrowUp', state);
@@ -234,12 +234,14 @@ function buildKeys (state: GlobalState): KeyManager {
   return keys
 }
 
-export function buildState (): GlobalState {
-  let globalState: GlobalState = {
-    terrain: undefined,
-    running: true,
-    lander: undefined,
-    safeZones: undefined,
+export function buildState (): GlobalState<PlayState> {
+  const state: GlobalState<PlayState> = {
+    localState: {
+      terrain: undefined,
+      running: true,
+      lander: undefined,
+      safeZones: undefined,
+    },
     commands: undefined,
     keys: undefined,
     config: {
@@ -257,18 +259,17 @@ export function buildState (): GlobalState {
       noFuel: new SoundEffect('assets/nofuel.wav', 1)
     }
   }
-  globalState.commands = buildCommands(globalState)
-  globalState.keys = buildKeys(globalState)
-  return globalState
+  state.commands = buildCommands(state)
+  state.keys = buildKeys(state)
+  return state
 }
 
-export function start (globalState: GlobalState, difficulty: number = 1) {
+export function start (state: GlobalState<PlayState>, difficulty = 1): void {
   const lander = new Lander(
     new Vector2(worldSize.x / 2, 0),
     landerTexture,
     new Vector2(5, 5)
   )
-  globalState.lander = lander
   drawables = [];
   ticking = [];
   drawables.push(lander)
@@ -283,8 +284,12 @@ export function start (globalState: GlobalState, difficulty: number = 1) {
     safeZones.push(terrain.insertSafeZone(min + validPortions * i, min + validPortions * (i + 1), count * 7.5));
   }
 
-  globalState.terrain = terrain;
-  globalState.safeZones = safeZones;
+  state.localState = {
+    safeZones,
+    lander,
+    terrain,
+    running: true
+  };
 
-  requestAnimationFrame(loop(globalState))
+  requestAnimationFrame(loop(state))
 }

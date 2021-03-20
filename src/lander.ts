@@ -3,85 +3,85 @@ import Drawable from './drawable'
 import Ticking from './ticking'
 import { CoordinateTranslatable } from './coordinate'
 import { drawTexture, Texture } from './texture'
-import { GlobalState } from './state'
+import { GlobalState, PlayState } from './state'
 import { ParticleEmitter, ParticleGenerator } from './particle'
 import { isColliding } from './collision'
 import { random } from './random'
 import Circle from './circle'
 
-class ThrustGenerator implements ParticleGenerator<GlobalState> {
+class ThrustGenerator implements ParticleGenerator<GlobalState<PlayState>> {
   private _rotationOffset: number
 
-  constructor (rotationOffset: number = 0) {
+  constructor (rotationOffset = 0) {
     this._rotationOffset = rotationOffset
   }
 
   private tex: Texture = new Texture('assets/Smoke.png', new Vector2(32, 32))
   private _size: Vector2 = new Vector2(0.425, 0.425)
-  texture (_: GlobalState): Texture {
+  texture (_: GlobalState<PlayState>): Texture {
     return this.tex
   }
-  size (state: GlobalState): Vector2 {
+  size (state: GlobalState<PlayState>): Vector2 {
     return this._size
   }
-  velocity (state: GlobalState): Vector2 {
-    let v = state.lander.rotationVector
-    let rotation = random.gaussian(12) * 100
+  velocity (state: GlobalState<PlayState>): Vector2 {
+    let v = state.localState.lander.rotationVector
+    const rotation = random.gaussian(12) * 100
     v = v.rotate(rotation + this._rotationOffset)
     v = v.scale(-5 * random.gaussian(12))
     return v
   }
-  lifetime (state: GlobalState): number {
+  lifetime (state: GlobalState<PlayState>): number {
     return 5 + random.gaussian(12)
   }
-  rotation (state: GlobalState): number {
+  rotation (state: GlobalState<PlayState>): number {
     return 0
   }
 }
-class ExplosionGenerator implements ParticleGenerator<GlobalState> {
+class ExplosionGenerator implements ParticleGenerator<GlobalState<PlayState>> {
   private tex: Texture = new Texture('assets/Fire.png', new Vector2(32, 32))
   private _size: Vector2 = new Vector2(0.425, 0.425)
-  texture (_: GlobalState): Texture {
+  texture (_: GlobalState<PlayState>): Texture {
     return this.tex
   }
-  size (state: GlobalState): Vector2 {
+  size (state: GlobalState<PlayState>): Vector2 {
     return this._size
   }
-  velocity (state: GlobalState): Vector2 {
-    let v = state.lander.rotationVector
-    let rotation = Math.random() * 360
+  velocity (state: GlobalState<PlayState>): Vector2 {
+    let v = state.localState.lander.rotationVector
+    const rotation = Math.random() * 360
     v = v.rotate(rotation)
     v = v.scale(-20 * random.gaussian(12))
     return v
   }
-  lifetime (state: GlobalState): number {
+  lifetime (state: GlobalState<PlayState>): number {
     return 2 + random.gaussian(12)
   }
-  rotation (state: GlobalState): number {
+  rotation (state: GlobalState<PlayState>): number {
     return 0
   }
 }
 
-export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
+export class Lander implements Drawable<GlobalState<PlayState>>, Ticking<GlobalState<PlayState>> {
   private size: Vector2
   private texture: Texture
   private _frozen: boolean
-  private thrustEmitter: ParticleEmitter<GlobalState>
-  private leftRotationEmitter: ParticleEmitter<GlobalState>
-  private rightRotationEmitter: ParticleEmitter<GlobalState>
-  private explosionEmitter: ParticleEmitter<GlobalState>
+  private thrustEmitter: ParticleEmitter<GlobalState<PlayState>>
+  private leftRotationEmitter: ParticleEmitter<GlobalState<PlayState>>
+  private rightRotationEmitter: ParticleEmitter<GlobalState<PlayState>>
+  private explosionEmitter: ParticleEmitter<GlobalState<PlayState>>
   private _position: Vector2
   private _velocity: Vector2
   private _rotationVector: Vector2
   private _rotation: number
-  private _explosionCount: number = 0
-  private _isExploding: boolean = false
+  private _explosionCount = 0
+  private _isExploding = false
 
-  fuel: number = 100
-  crashed: boolean = false
-  thrusting: boolean = false
-  turningLeft: boolean = false
-  turningRight: boolean = false
+  fuel = 100
+  crashed = false
+  thrusting = false
+  turningLeft = false
+  turningRight = false
 
   constructor (position: Vector2, texture: Texture, size: Vector2) {
     this.texture = texture
@@ -93,19 +93,19 @@ export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
     this._rotation = 0
     this.thrustEmitter = new ParticleEmitter(
       new ThrustGenerator(),
-      state => state.lander.thrusting && state.lander.fuel > 0 && !this._frozen,
+      state => state.localState.lander.thrusting && state.localState.lander.fuel > 0 && !this._frozen,
       0.03,
       5
     )
     this.leftRotationEmitter = new ParticleEmitter(
       new ThrustGenerator(90),
-      state => state.lander.turningLeft && state.lander.fuel > 0 && !this._frozen,
+      state => state.localState.lander.turningLeft && state.localState.lander.fuel > 0 && !this._frozen,
       0.03,
       3
     )
     this.rightRotationEmitter = new ParticleEmitter(
       new ThrustGenerator(-90),
-      state => state.lander.turningRight && state.lander.fuel > 0 && !this._frozen,
+      state => state.localState.lander.turningRight && state.localState.lander.fuel > 0 && !this._frozen,
       0.03,
       3
     )
@@ -120,10 +120,10 @@ export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
 
   draw (
     context: CanvasRenderingContext2D,
-    state: GlobalState,
+    state: GlobalState<PlayState>,
     coordinates: CoordinateTranslatable
   ) {
-    if (!state.lander.crashed) {
+    if (!state.localState.lander.crashed) {
       drawTexture(
         context,
         this.texture,
@@ -141,13 +141,13 @@ export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
 
   private debugDraw (
     context: CanvasRenderingContext2D,
-    state: GlobalState,
+    state: GlobalState<PlayState>,
     coordinates: CoordinateTranslatable
   ) {
     // Debug collision
     context.beginPath()
     context.strokeStyle = '#ffffff'
-    let circlepos = coordinates.translate(this._position)
+    const circlepos = coordinates.translate(this._position)
     context.arc(
       circlepos.x,
       circlepos.y,
@@ -156,10 +156,10 @@ export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
       Math.PI * 2
     )
     context.stroke()
-    let adjPos = coordinates.translate(this._position)
+    const adjPos = coordinates.translate(this._position)
 
     // Debug rotation
-    let adjVec = coordinates.translate(this._rotationVector.scale(5))
+    const adjVec = coordinates.translate(this._rotationVector.scale(5))
     context.beginPath()
     if (this._rotation % 360 < 5 && this._rotation % 360 > -5) {
       context.strokeStyle = '#00ff00'
@@ -171,7 +171,7 @@ export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
     context.stroke()
 
     // Debug velocity
-    let velocity = coordinates.translate(this._velocity.normalize().scale(5))
+    const velocity = coordinates.translate(this._velocity.normalize().scale(5))
     context.beginPath()
     if (this._velocity.sqrMagnitude() < 4) {
       context.strokeStyle = '#0000ff'
@@ -196,7 +196,7 @@ export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
     this.explosionEmitter.position = this._position
   }
 
-  update (delta: number, state: GlobalState): void {
+  update (delta: number, state: GlobalState<PlayState>): void {
     if (this._isExploding) {
       console.log('Explosion')
       this._explosionCount++
@@ -230,22 +230,22 @@ export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
       this._position = this._position.add(this._velocity.scale(delta))
       this.positionEmitters()
       // this.thrustEmitter.update(delta, state);
-      for (let i = 0; i < state.terrain.points.length - 1; i++) {
+      for (let i = 0; i < state.localState.terrain.points.length - 1; i++) {
         if (
           isColliding(
             new Circle(this._position, 2),
-            state.terrain.points[i],
-            state.terrain.points[i + 1]
+            state.localState.terrain.points[i],
+            state.localState.terrain.points[i + 1]
           )
         ) {
           if (
             this.velocity.sqrMagnitude() <= 4 &&
             (this.rotation < 5 || this.rotation > 355)
           ) {
-            for (let j = 0; j < state.safeZones.length; j++) {
+            for (let j = 0; j < state.localState.safeZones.length; j++) {
               if (
-                state.terrain.points[i] == state.safeZones[j][0] &&
-                state.terrain.points[i + 1] == state.safeZones[j][1]
+                state.localState.terrain.points[i] == state.localState.safeZones[j][0] &&
+                state.localState.terrain.points[i + 1] == state.localState.safeZones[j][1]
               ) {
                 state.commands.execute('safeLanding', state)
                 return
@@ -268,7 +268,7 @@ export class Lander implements Drawable<GlobalState>, Ticking<GlobalState> {
     }
   }
 
-  private rotate (delta: number, state: GlobalState, direction: number) {
+  private rotate (delta: number, state: GlobalState<PlayState>, direction: number) {
     this.fuel -= state.config.fuelConsumption * delta * 0.5
     this._rotation += direction * state.config.theta * delta
     this._rotationVector = this._rotationVector.rotate(

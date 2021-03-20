@@ -5,18 +5,22 @@ import { SoundEffect } from "./sound";
 import { Terrain } from "./terrain";
 import Vector2 from "./vector2";
 
-export interface GlobalState {
+export interface GlobalState<T> {
   // Rates
   config: GameConfig;
+  localState: T;
+  commands: CommandService<GlobalState<T>>;
+  keys: KeyManager;
+  sounds: GameSounds;
+}
+
+export interface PlayState {
   // Game Running
   running: boolean;
   // Important Objects
   lander: Lander;
   terrain: Terrain;
   safeZones: Array<Array<Vector2>>;
-  commands: CommandService<GlobalState>;
-  keys: KeyManager;
-  sounds: GameSounds;
 }
 
 export interface GameSounds {

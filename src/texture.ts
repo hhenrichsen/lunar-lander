@@ -5,8 +5,8 @@ export function drawTexture(
   texture: Texture,
   position: Vector2,
   size: Vector2,
-  rotation: number = 0
-) {
+  rotation = 0
+): void {
   if (!texture.ready) {
     return;
   }
@@ -27,7 +27,7 @@ export function drawTexture(
 export class Texture {
   size: Vector2;
   el: HTMLImageElement;
-  ready: boolean = false;
+  ready = false;
   constructor(texture: string, size: Vector2) {
     this.el = new Image();
     this.el.src = texture;
@@ -40,4 +40,3 @@ export class Texture {
     return this.el;
   }
 }
-``;

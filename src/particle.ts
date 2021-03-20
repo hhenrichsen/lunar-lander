@@ -25,9 +25,9 @@ export class ParticleContainer<T> implements Ticking<T> {
 
 export class ParticleEmitter<T> implements Ticking<T>, Drawable<T> {
   position: Vector2;
-  private _rate: number = 0.1;
-  private _elapsed: number = 0;
-  private _count: number = 10;
+  private _rate = 0.1;
+  private _elapsed = 0;
+  private _count = 10;
   private _container: ParticleContainer<T>;
   private _particleGenerator: ParticleGenerator<T>;
   private _predicate: Predicate<T>;
@@ -35,8 +35,8 @@ export class ParticleEmitter<T> implements Ticking<T>, Drawable<T> {
   constructor(
     generator: ParticleGenerator<T>,
     predicate: Predicate<T>,
-    rate: number = 0.1,
-    count: number = 10
+    rate = 0.1,
+    count = 10
   ) {
     this._container = new ParticleContainer<T>();
     this._particleGenerator = generator;
@@ -54,7 +54,7 @@ export class ParticleEmitter<T> implements Ticking<T>, Drawable<T> {
     });
   }
 
-  update(delta: number, state: T) {
+  update(delta: number, state: T): void {
     if (this._predicate(state)) {
       this._elapsed += delta;
       if (this._elapsed > this._rate) {

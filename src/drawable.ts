@@ -1,4 +1,3 @@
-import Position from "./vector2";
 import { CoordinateTranslatable } from "./coordinate";
 
 export interface Drawable<T> {

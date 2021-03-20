@@ -7,27 +7,27 @@ export function drawTerrain(
   ctx: CanvasRenderingContext2D,
   state: GlobalState,
   vcs: CoordinateTranslatable,
-) {
+): void {
   ctx.beginPath();
   ctx.lineTo(vcs.translateValueX(0), vcs.translateValueY(state.config.worldSize.y));
 
-  var grd = ctx.createLinearGradient(0, 0, 0, 1000);
+  const grd = ctx.createLinearGradient(0, 0, 0, 1000);
   grd.addColorStop(0, "#ffffff");
   grd.addColorStop(1, "#777777");
 
-  for (let i = 1; i < state.terrain.points.length; i++) {
-    let pt = vcs.translate(state.terrain.points[i]);
+  for (let i = 1; i < state.localState.terrain.points.length; i++) {
+    const pt = vcs.translate(state.localState.terrain.points[i]);
     ctx.lineTo(pt.x, pt.y);
   }
   ctx.lineTo(vcs.translateValueX(state.config.worldSize.x), vcs.translateValueY(state.config.worldSize.y));
   ctx.fillStyle = grd;
   ctx.fill();
 
-  for (let i = 0; i < state.safeZones.length; i++) {
+  for (let i = 0; i < state.localState.safeZones.length; i++) {
     ctx.strokeStyle = "#f69205"
     ctx.lineWidth = vcs.translateValueY(0.5);
     ctx.beginPath();
-    let [pt1, pt2] = state.safeZones[i].map(vcs.translate);
+    const [pt1, pt2] = state.localState.safeZones[i].map(vcs.translate);
     ctx.lineTo(pt1.x, pt1.y);
     ctx.lineTo(pt2.x, pt2.y);
     ctx.stroke();
@@ -39,7 +39,7 @@ export class Terrain {
   constructor(iterations: number, roughness: number, p1: Vector2, p2: Vector2) {
     this.points = [p1, p2];
     for (let i = 0; i < iterations; i++) {
-      let savedLength = this.points.length;
+      const savedLength = this.points.length;
       roughness /= 2;
       for (let j = 0; j < savedLength - 1; j++) {
         let mid = new Vector2(
@@ -52,17 +52,17 @@ export class Terrain {
     }
   }
 
-  insertSafeZone(minX: number, maxX: number, width: number) {
-    let targetXMin = minX + width / 2;
-    let targetXMax = maxX - width / 2;
-    let diff = targetXMax - targetXMin;
-    let offset = targetXMin + diff * Math.random();
+  insertSafeZone(minX: number, maxX: number, width: number): Array<Vector2> {
+    const targetXMin = minX + width / 2;
+    const targetXMax = maxX - width / 2;
+    const diff = targetXMax - targetXMin;
+    const offset = targetXMin + diff * Math.random();
     let i = 0;
     let point = this.points[0];
     while (point.x < offset) {
       point = this.points[++i];
     }
-    let saved = point;
+    const saved = point;
     i++;
     point = this.points[i];
     let x = 0;
