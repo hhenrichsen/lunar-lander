@@ -24,11 +24,11 @@ export interface PlayState {
 }
 
 export interface GameSounds {
-    mainThruster: SoundEffect;
-    subThruster: SoundEffect;
-    explosion: SoundEffect;
-    landing: SoundEffect;
-    noFuel: SoundEffect;
+  mainThruster: SoundEffect;
+  subThruster: SoundEffect;
+  explosion: SoundEffect;
+  landing: SoundEffect;
+  noFuel: SoundEffect;
 }
 
 export interface GameConfig {
@@ -36,5 +36,5 @@ export interface GameConfig {
   thrustCoefficient: number; // u / second
   fuelConsumption: number; // fuel / second
   theta: number; // degrees / second
-  worldSize: Vector2
+  worldSize: Vector2;
 }

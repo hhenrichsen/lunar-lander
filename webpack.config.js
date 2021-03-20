@@ -1,15 +1,15 @@
-const path = require('path');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const HTMLWebpackPlugin = require('html-webpack-plugin');
+const path = require("path");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
+const HTMLWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-  entry: './src/index.ts',
-  devtool: 'inline-source-map',
+  entry: "./src/index.ts",
+  devtool: "inline-source-map",
   module: {
     rules: [
       {
         test: /\.ts$/,
-        loader: 'babel-loader',
+        loader: "babel-loader",
       },
     ],
   },
@@ -18,20 +18,20 @@ module.exports = {
       patterns: [
         {
           from: "assets",
-          to: "assets"
+          to: "assets",
         },
         {
           from: "html",
-          to: "."
-        }
-      ]
-    })
+          to: ".",
+        },
+      ],
+    }),
   ],
   resolve: {
-    extensions: ['.ts'],
+    extensions: [".ts"],
   },
   output: {
-    filename: 'bundle.js',
-    path: path.resolve(__dirname, 'dist'),
+    filename: "bundle.js",
+    path: path.resolve(__dirname, "dist"),
   },
 };

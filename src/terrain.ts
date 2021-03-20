@@ -1,15 +1,18 @@
 import Vector2 from "./vector2";
 import { random } from "./random";
 import { CoordinateTranslatable } from "./coordinate";
-import { GlobalState } from "./state";
+import { GlobalState, PlayState } from "./state";
 
 export function drawTerrain(
   ctx: CanvasRenderingContext2D,
-  state: GlobalState,
-  vcs: CoordinateTranslatable,
+  state: GlobalState<PlayState>,
+  vcs: CoordinateTranslatable
 ): void {
   ctx.beginPath();
-  ctx.lineTo(vcs.translateValueX(0), vcs.translateValueY(state.config.worldSize.y));
+  ctx.lineTo(
+    vcs.translateValueX(0),
+    vcs.translateValueY(state.config.worldSize.y)
+  );
 
   const grd = ctx.createLinearGradient(0, 0, 0, 1000);
   grd.addColorStop(0, "#ffffff");
@@ -19,12 +22,15 @@ export function drawTerrain(
     const pt = vcs.translate(state.localState.terrain.points[i]);
     ctx.lineTo(pt.x, pt.y);
   }
-  ctx.lineTo(vcs.translateValueX(state.config.worldSize.x), vcs.translateValueY(state.config.worldSize.y));
+  ctx.lineTo(
+    vcs.translateValueX(state.config.worldSize.x),
+    vcs.translateValueY(state.config.worldSize.y)
+  );
   ctx.fillStyle = grd;
   ctx.fill();
 
   for (let i = 0; i < state.localState.safeZones.length; i++) {
-    ctx.strokeStyle = "#f69205"
+    ctx.strokeStyle = "#f69205";
     ctx.lineWidth = vcs.translateValueY(0.5);
     ctx.beginPath();
     const [pt1, pt2] = state.localState.safeZones[i].map(vcs.translate);

@@ -31,7 +31,7 @@ export class CommandService<T> {
   }
 
   public has(name: string): boolean {
-      return this.commands.has(name);
+    return this.commands.has(name);
   }
 
   public execute(name: string, state: T): void {

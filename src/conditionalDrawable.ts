@@ -23,6 +23,9 @@ export class ConditionalDrawable<T> implements Drawable<T> {
   }
 }
 
-export function ifDraw<T>(pred: DrawPredicate<T>, drawable: Drawable<T>): ConditionalDrawable<T> {
+export function ifDraw<T>(
+  pred: DrawPredicate<T>,
+  drawable: Drawable<T>
+): ConditionalDrawable<T> {
   return new ConditionalDrawable<T>(pred, drawable);
 }

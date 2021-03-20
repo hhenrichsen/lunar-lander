@@ -7,14 +7,14 @@ import { CoordinateTranslatable } from "./coordinate";
 
 export class ParticleContainer<T> implements Ticking<T> {
   particles: Array<ParticleEffect<T>>;
-  update(delta: number, state: T) {
+  update(delta: number, state: T): void {
     // TODO: Check on the efficiency of this.
     this.particles = this.particles.filter((p) => {
       p.update(delta, state);
       return p.remainingTime > 0;
     });
   }
-  add(particle: ParticleEffect<T>) {
+  add(particle: ParticleEffect<T>): void {
     this.particles.push(particle);
   }
 
@@ -115,7 +115,7 @@ export class ParticleEffect<T> implements Drawable<T>, Ticking<T> {
     context: CanvasRenderingContext2D,
     state: T,
     coordinates: CoordinateTranslatable
-  ) {
+  ): void {
     context.globalAlpha = 1 - this._elapsedLifetime / this._lifetime;
     drawTexture(
       context,

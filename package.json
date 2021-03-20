@@ -6,7 +6,9 @@
   "scripts": {
     "build": "webpack",
     "build:watch": "webpack watch",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "check": "prettier --check \"src/**/*.ts\""
   },
   "author": "Hunter Henrichsen <hunter.henrichsen@gmail.com>",
   "license": "UNLICENSED",
@@ -24,6 +26,7 @@
     "babel-plugin-transform-class-properties": "^6.24.1",
     "copy-webpack-plugin": "^8.0.0",
     "eslint": "^7.22.0",
+    "eslint-config-prettier": "^8.1.0",
     "file-loader": "^6.2.0",
     "html-webpack-plugin": "^5.3.1",
     "parcel": "^2.0.0-alpha.3.1",

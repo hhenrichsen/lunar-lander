@@ -1,5 +1,5 @@
 class Random {
-  gaussian(count = 6) : number {
+  gaussian(count = 6): number {
     let rand = 0;
 
     for (let i = 0; i < count; i++) {
