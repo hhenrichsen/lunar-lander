@@ -5,7 +5,10 @@ export function buildCommands(
   state: GlobalState<PlayState>
 ): CommandService<GlobalState<PlayState>> {
   const commands = new CommandService<GlobalState<PlayState>>();
-  // Command Creation
+  commands.createCommand("changeThrustControl", (state) => {
+    state.keys.remove
+  })
+
   commands.createCommand("beginThrust", (state) => {
     if (state.localState.lander.frozen) return;
     state.localState.lander.thrusting = true;
@@ -73,7 +76,14 @@ export function buildCommands(
     state.localState.lander.freeze();
     setTimeout(() => {
       state.localState.running = false;
-      state.router.requestTransition('play', {level: 2});
+      state.localState.transition = true;
+      state.localState.score += (state.localState.lander.fuel * state.localState.level);
+      if (state.localState.level == 2) {
+        state.router.requestTransition('scores', true, {score: state.localState.score});
+      }
+      else {
+        state.router.requestTransition('play', true, {level: 2, score: state.localState.score});
+      }
     }, 3000);
   });
 
@@ -86,7 +96,7 @@ export function buildCommands(
     state.localState.lander.freeze();
     setTimeout(() => {
       state.localState.running = false;
-      state.router.requestTransition('home');
+      state.router.requestTransition('scores', true, { score: state.localState.score });
     }, 3000);
   });
 

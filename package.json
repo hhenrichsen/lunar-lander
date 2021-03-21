@@ -6,7 +6,8 @@
   "scripts": {
     "build": "webpack",
     "build:watch": "webpack watch",
-    "deploy": "gh-pages -d dist",
+    "build:prod": "webpack -c ./webpack.prod.js",
+    "deploy": "npm run build:prod && gh-pages -d dist",
     "format": "prettier --write \"src/**/*.ts\"",
     "check": "prettier --check \"src/**/*.ts\"",
     "lint": ""

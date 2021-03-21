@@ -93,7 +93,7 @@ export class Lander
     this._rotationVector = new Vector2(0, -1);
     this._rotation = 0;
     this.thrustEmitter = new ParticleEmitter(
-      new ThrustGenerator(),
+      new ThrustGenerator(180),
       (state) =>
         state.localState.lander.thrusting &&
         state.localState.lander.fuel > 0 &&

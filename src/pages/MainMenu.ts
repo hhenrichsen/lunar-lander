@@ -1,7 +1,7 @@
 import { Page } from "../core/menus/Page";
 import { GlobalState } from "../content/State";
 
-export class MainMenu implements Page<GlobalState<unknown>> {
+export class HomePage implements Page<GlobalState<unknown>> {
     load(base: HTMLElement, state: GlobalState<unknown>): void {
         const img = document.createElement('img');
         img.src = 'assets/Lander.png';
@@ -15,7 +15,7 @@ export class MainMenu implements Page<GlobalState<unknown>> {
         const play = document.createElement('a');
         play.href = "#";
         play.addEventListener('click', () => {
-            state.router.requestTransition('play', { level: 1 });
+            state.router.requestTransition('play', true, { level: 1 });
         })
         play.innerText = "Play";
         base.appendChild(play);
@@ -46,11 +46,15 @@ export class MainMenu implements Page<GlobalState<unknown>> {
     }
 
     init(globalState: GlobalState<unknown>): void {
-        globalState.localState = null;
+        globalState.localState = undefined;
     }
 
     canTransition(_: string): boolean {
         return true;
+    }
+
+    cleanup(state: GlobalState<unknown>): void {
+        return;
     }
 
 }

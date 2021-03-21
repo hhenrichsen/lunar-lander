@@ -7,13 +7,15 @@ export interface Page<T> {
 
     /**
      * Load your localState into the page.
-     * @param globalState The globalState to add local state to.
+     * @param state The globalState to add local state to.
      */
-    init(globalState: T): void;
+    init(state: T): void;
 
     /**
      * If the transition to the next page is valid.
      * @param nextPage The ID of the next page.
      */
     canTransition(nextPage: string): boolean;
+
+    cleanup(state: T): void;
 }

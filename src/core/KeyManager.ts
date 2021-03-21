@@ -58,6 +58,7 @@ class KeyHandler {
 export class KeyManager {
   private handlers: Map<string, KeyHandler>;
   private descriptions: Map<string, string>;
+  private _listening: boolean;
   public registerHandler(keyCode: string, description?: string) {
     if (!this.handlers.has(keyCode)) {
       this.handlers.set(keyCode, new KeyHandler());
@@ -76,6 +77,9 @@ export class KeyManager {
     this.handlers.get(keyCode).addChanged(updateFn);
   }
   updateDown(event: KeyboardEvent) {
+    if (!this._listening) {
+      return;
+    }
     if (this.handlers.has(event.key)) {
       event.preventDefault();
       const handler = this.handlers.get(event.key);
@@ -88,6 +92,9 @@ export class KeyManager {
   }
 
   updateUp(event: KeyboardEvent) {
+    if (!this._listening) {
+      return;
+    }
     if (this.handlers.has(event.key)) {
       event.preventDefault();
       const handler = this.handlers.get(event.key);
@@ -103,6 +110,7 @@ export class KeyManager {
   }
 
   remove(keycode: string) {
+    console.log(`${keycode} should be deleted.`);
     this.handlers.delete(keycode);
   }
 
@@ -110,6 +118,18 @@ export class KeyManager {
     window.addEventListener("keydown", this.updateDown.bind(this));
     window.addEventListener("keyup", this.updateUp.bind(this));
     this.handlers = new Map<string, KeyHandler>();
+  }
+
+  set listening(listening: boolean)  {
+    this._listening = listening;
+  }
+  
+  get listening(): boolean {
+    return this._listening
+  }
+
+  hasKey(keycode: string) : boolean {
+    return this.handlers.has(keycode);
   }
 }
 

@@ -15,16 +15,26 @@ export class PlayPage extends GamePage<GlobalState<PlayState>> {
   private fuelPosition = new Vector2(5, 5)
   private anglePosition = new Vector2(5, 7.5)
   private velocityPosition = new Vector2(5, 10)
+  private scorePosition = new Vector2(5, 12.5)
+  private countdownPosition = new Vector2(5, 15)
+
+  private countdown = 0;
 
   protected preLoad(element: HTMLElement, state: GlobalState<unknown>): void {
     super.setBounds(state.config.screenRatio, state.config.worldSize);
   }
 
   postInit (state: GlobalState<unknown>): void {
-    const difficulty =
-      state.router.transitionData !== undefined
-        ? (state.router.transitionData.level as number)
-        : 1
+    let difficulty = 1;
+    let score = 0;
+    if (state.router.transitionData !== undefined) {
+      if (state.router.transitionData['score'] !== undefined) {
+        score = state.router.transitionData['score'] as number;
+      }
+      if (state.router.transitionData['level'] !== undefined) {
+        difficulty = state.router.transitionData['level'] as number;
+      }
+    }
     const lander = new Lander(
       new Vector2(state.config.worldSize.x / 2, 0),
       this.landerTexture,
@@ -55,11 +65,16 @@ export class PlayPage extends GamePage<GlobalState<PlayState>> {
     }
 
     state.localState = {
+      running: true,
+      ticking: true,
+      level: difficulty,
       safeZones,
       lander,
       terrain,
-      running: true
+      score,
+      transition: false,
     }
+    state.keys.listening = true;
   }
 
   canTransition (nextPage: string): boolean {
@@ -82,8 +97,13 @@ export class PlayPage extends GamePage<GlobalState<PlayState>> {
   }
 
   public update (delta: number, state: GlobalState<PlayState>) {
-    for (let i = 0; i < this.ticking.length; i++) {
-      this.ticking[i].update(delta, state)
+    if (state.localState.ticking) {
+      for (let i = 0; i < this.ticking.length; i++) {
+        this.ticking[i].update(delta, state)
+      }
+      if (state.localState.transition) {
+        this.countdown += delta;
+      } 
     }
   }
 
@@ -142,5 +162,24 @@ export class PlayPage extends GamePage<GlobalState<PlayState>> {
       adjustedVelocityPosition.y
     )
     context.fillStyle = '#ffffff'
+    const score = state.localState.level * state.localState.lander.fuel;
+    const adjustedScorePosition = this.vcs.translate(this.scorePosition)
+    context.fillText(
+      `Score: ${(score + state.localState.score).toFixed(0)}`,
+      adjustedScorePosition.x,
+      adjustedScorePosition.y
+    )
+    if (state.localState.transition) {
+      const adjustedCountdownPosition = this.vcs.translate(this.countdownPosition)
+      context.fillText(
+        `Next level in ${this.countdown.toFixed(2)}`,
+        adjustedCountdownPosition.x,
+        adjustedCountdownPosition.y
+      )
+    }
+  }
+
+  cleanup(state: GlobalState<PlayState>) {
+    state.keys.listening = false; 
   }
 }
