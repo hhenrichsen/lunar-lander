@@ -51,9 +51,9 @@ export function buildState(): GlobalState<PlayState> {
     return {
       scores: [],
       eventMap: {
-        'Thrust': 'UpArrow',
-        'TurnLeft': 'LeftArrow',
-        'TurnRight': 'RightArrow'
+        'Thrust': 'ArrowUp',
+        'TurnLeft': 'ArrowLeft',
+        'TurnRight': 'ArrowRight'
       }
     }
   }, isPersistentState);
