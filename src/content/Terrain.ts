@@ -1,7 +1,7 @@
-import Vector2 from "./vector2";
-import { random } from "./random";
-import { CoordinateTranslatable } from "./coordinate";
-import { GlobalState, PlayState } from "./state";
+import Vector2 from "../core/geometry/Vector2";
+import { random } from "../core/Random";
+import { CoordinateTranslatable } from "../core/rendering/VirtualCoordinate";
+import { GlobalState, PlayState } from "./State";
 
 export function drawTerrain(
   ctx: CanvasRenderingContext2D,
@@ -42,7 +42,7 @@ export function drawTerrain(
 
 export class Terrain {
   points: Array<Vector2>;
-  constructor(iterations: number, roughness: number, p1: Vector2, p2: Vector2) {
+  constructor(iterations: number, roughness: number, p1: Vector2, p2: Vector2, min = 100) {
     this.points = [p1, p2];
     for (let i = 0; i < iterations; i++) {
       const savedLength = this.points.length;
@@ -53,6 +53,7 @@ export class Terrain {
           (this.points[j * 2].y + this.points[j * 2 + 1].y) / 2
         );
         mid = mid.add(new Vector2(0, random.gaussian(12) * roughness));
+        mid = new Vector2(mid.x, Math.min(mid.y, min));
         this.points.splice(j * 2 + 1, 0, mid);
       }
     }

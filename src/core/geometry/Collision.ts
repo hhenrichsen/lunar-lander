@@ -1,5 +1,5 @@
-import Vector2 from "./vector2";
-import Circle from "./circle";
+import Vector2 from "./Vector2";
+import Circle from "./Circle";
 
 /**
  * Line-Circle Intersection

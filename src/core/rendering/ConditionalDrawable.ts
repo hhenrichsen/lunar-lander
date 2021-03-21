@@ -1,5 +1,5 @@
-import { CoordinateTranslatable } from "./coordinate";
-import Drawable from "./drawable";
+import { CoordinateTranslatable } from "./VirtualCoordinate";
+import Drawable from "./Drawable";
 
 export interface DrawPredicate<T> {
   (state: T): boolean;

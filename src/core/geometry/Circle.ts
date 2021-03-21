@@ -1,4 +1,4 @@
-import Vector2 from "./vector2";
+import Vector2 from "./Vector2";
 
 export default class Circle {
   private _center: Vector2;

@@ -1,13 +1,13 @@
-import Vector2 from "./vector2";
-import Drawable from "./drawable";
-import Ticking from "./ticking";
-import { CoordinateTranslatable } from "./coordinate";
-import { drawTexture, Texture } from "./texture";
-import { GlobalState, PlayState } from "./state";
-import { ParticleEmitter, ParticleGenerator } from "./particle";
-import { isColliding } from "./collision";
-import { random } from "./random";
-import Circle from "./circle";
+import Vector2 from "../core/geometry/Vector2";
+import Drawable from "../core/rendering/Drawable";
+import Ticking from "../core/Ticking";
+import { CoordinateTranslatable } from "../core/rendering/VirtualCoordinate";
+import { drawTexture, Texture } from "../core/rendering/Texture";
+import { GlobalState, PlayState } from "./State";
+import { ParticleEmitter, ParticleGenerator } from "../core/rendering/Particle";
+import { isColliding } from "../core/geometry/Collision";
+import { random } from "../core/Random";
+import Circle from "../core/geometry/Circle";
 
 class ThrustGenerator implements ParticleGenerator<GlobalState<PlayState>> {
   private _rotationOffset: number;

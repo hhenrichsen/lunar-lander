@@ -1,4 +1,4 @@
-import Vector2 from "./vector2";
+import Vector2 from "../geometry/Vector2";
 
 export class VirtualCoordinateSystem {
   private scaleX: number;

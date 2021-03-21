@@ -1,8 +1,8 @@
 export class Vector2 {
   static ZERO: Vector2 = new Vector2(0, 0);
 
-  private _x: number = 0;
-  private _y: number = 0;
+  private _x = 0;
+  private _y = 0;
 
   static random(): Vector2 {
     return new Vector2(Math.random(), Math.random()).normalize();
@@ -50,7 +50,7 @@ export class Vector2 {
 
   rotate(degrees: number): Vector2 {
     const rad = (degrees * Math.PI) / 180;
-    let val = new Vector2(
+    const val = new Vector2(
       this.x * Math.cos(rad) - Math.sin(rad) * this.y,
       this.x * Math.sin(rad) + this.y * Math.cos(rad)
     );

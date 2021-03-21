@@ -1,4 +1,4 @@
-import { CommandService } from "./command";
+import { CommandService } from "./Command";
 
 interface Modifiers {
   alt: boolean;
@@ -11,7 +11,7 @@ interface KeyResponse {
 }
 
 class KeyHandler {
-  private _wasPressed: boolean = false;
+  private _wasPressed = false;
   private _lastPressed: number = Date.now();
   private _onStateChanged: Set<KeyResponse> = new Set();
   private _onKeyUp: Set<KeyResponse> = new Set();
@@ -31,10 +31,10 @@ class KeyHandler {
       const now = Date.now();
 
       // Handlers
-      for (let res of set) {
+      for (const res of set) {
         res(pressed, now - this._lastPressed, modifiers);
       }
-      for (let res of this._onStateChanged) {
+      for (const res of this._onStateChanged) {
         res(pressed, now - this._lastPressed, modifiers);
       }
 

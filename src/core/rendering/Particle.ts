@@ -1,9 +1,9 @@
-import Ticking from "./ticking";
-import Vector2 from "./vector2";
-import Drawable from "./drawable";
-import { Predicate } from "./functional";
-import { drawTexture, Texture } from "./texture";
-import { CoordinateTranslatable } from "./coordinate";
+import Ticking from "../Ticking";
+import Vector2 from "../geometry/Vector2";
+import Drawable from "./Drawable";
+import { Predicate } from "../Predicate";
+import { drawTexture, Texture } from "./Texture";
+import { CoordinateTranslatable } from "./VirtualCoordinate";
 
 export class ParticleContainer<T> implements Ticking<T> {
   particles: Array<ParticleEffect<T>>;

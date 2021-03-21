@@ -1,4 +1,4 @@
-import { CoordinateTranslatable } from "./coordinate";
+import { CoordinateTranslatable } from "./VirtualCoordinate";
 
 export interface Drawable<T> {
   draw(

@@ -8,7 +8,8 @@
     "build:watch": "webpack watch",
     "deploy": "gh-pages -d dist",
     "format": "prettier --write \"src/**/*.ts\"",
-    "check": "prettier --check \"src/**/*.ts\""
+    "check": "prettier --check \"src/**/*.ts\"",
+    "lint": ""
   },
   "author": "Hunter Henrichsen <hunter.henrichsen@gmail.com>",
   "license": "UNLICENSED",

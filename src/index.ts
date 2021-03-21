@@ -1,4 +1,4 @@
-import { buildState, start } from "./game";
+import { buildState } from './init';
 
-var globalState = buildState();
-start(globalState, 1);
+const globalState = buildState();
+globalState.router.requestTransition('home');
