@@ -40,6 +40,7 @@ export class PlayPage extends GamePage<GlobalState<PlayState>> {
       this.landerTexture,
       new Vector2(5, 5)
     )
+    this.countdown = 0;
     this.drawables.push(lander)
     this.ticking.push(lander)
     const terrain = new Terrain(
@@ -172,7 +173,7 @@ export class PlayPage extends GamePage<GlobalState<PlayState>> {
     if (state.localState.transition) {
       const adjustedCountdownPosition = this.vcs.translate(this.countdownPosition)
       context.fillText(
-        `Next level in ${this.countdown.toFixed(2)}`,
+        `Next level in ${Math.max((3 - this.countdown), 0).toFixed(2)}`,
         adjustedCountdownPosition.x,
         adjustedCountdownPosition.y
       )

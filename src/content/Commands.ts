@@ -74,9 +74,9 @@ export function buildCommands(
   commands.createCommand("safeLanding", (state) => {
     state.sounds.landing.play();
     state.localState.lander.freeze();
+    state.localState.transition = true;
     setTimeout(() => {
       state.localState.running = false;
-      state.localState.transition = true;
       state.localState.score += (state.localState.lander.fuel * state.localState.level);
       if (state.localState.level == 2) {
         state.router.requestTransition('scores', true, {score: state.localState.score});
