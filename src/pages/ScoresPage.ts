@@ -45,7 +45,7 @@ export class ScoresPage implements Page<GlobalState<unknown>> {
             }
         }
 
-        const scoreList = scores.sort().reverse();
+        const scoreList = scores.sort();
         for (const score of scoreList) {
             const scoreElement = document.createElement('p');
             scoreElement.innerText = `${score.score} - ${score.name}`
