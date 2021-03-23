@@ -75,16 +75,7 @@ export function buildCommands(
     state.sounds.landing.play();
     state.localState.lander.freeze();
     state.localState.transition = true;
-    setTimeout(() => {
-      state.localState.running = false;
-      state.localState.score += (state.localState.lander.fuel * state.localState.level);
-      if (state.localState.level == 2) {
-        state.router.requestTransition('scores', true, {score: state.localState.score});
-      }
-      else {
-        state.router.requestTransition('play', true, {level: 2, score: state.localState.score});
-      }
-    }, 3000);
+    state.localState.lander.safe = true;
   });
 
   commands.createCommand("crashLanding", (state) => {
@@ -94,10 +85,6 @@ export function buildCommands(
     state.sounds.explosion.play();
     state.localState.lander.crashed = true;
     state.localState.lander.freeze();
-    setTimeout(() => {
-      state.localState.running = false;
-      state.router.requestTransition('scores', true, { score: state.localState.score });
-    }, 3000);
   });
 
   return commands;
