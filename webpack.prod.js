@@ -3,35 +3,40 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HTMLWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-  entry: "./src/index.ts",
-  module: {
-    rules: [
-      {
-        test: /\.ts$/,
-        loader: "babel-loader",
-      },
+    entry: "./src/index.ts",
+    module: {
+        rules: [
+            {
+                test: /\.ts$/,
+                loader: "babel-loader",
+            },
+        ],
+    },
+    plugins: [
+        new CopyWebpackPlugin({
+            patterns: [
+                {
+                    from: "assets",
+                    to: "assets",
+                    globOptions: {
+                        ignore: ["**/*.md"],
+                    },
+                },
+                {
+                    from: "html",
+                    to: ".",
+                    globOptions: {
+                        ignore: ["**/*.md"],
+                    },
+                },
+            ],
+        }),
     ],
-  },
-  plugins: [
-    new CopyWebpackPlugin({
-      patterns: [
-        {
-          from: "assets",
-          to: "assets",
-        },
-        {
-          from: "html",
-          to: ".",
-        },
-      ],
-    }),
-  ],
-  resolve: {
-    extensions: [".ts"],
-  },
-  output: {
-    filename: "bundle.js",
-    path: path.resolve(__dirname, "dist"),
-  },
+    resolve: {
+        extensions: [".ts"],
+    },
+    output: {
+        filename: "bundle.js",
+        path: path.resolve(__dirname, "dist"),
+    },
 };
-
