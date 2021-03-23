@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "description": "A lunar lander canvas game.",
   "main": "src/lunarlander.ts",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/hhenrichsen/lunar-lander",
+    "directory": ".git"
+  },
   "scripts": {
     "build": "webpack",
     "build:watch": "webpack watch",
