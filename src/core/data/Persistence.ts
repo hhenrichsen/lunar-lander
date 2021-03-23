@@ -1,5 +1,5 @@
 export class PersistenceManager<T, R> {
-    private initializer: (state: T) => R
+    private initializer: (state: T) => R;
     private typeGuard: (obj: unknown) => boolean;
     private name: string;
 
@@ -9,14 +9,13 @@ export class PersistenceManager<T, R> {
         this.name = name;
     }
 
-    get(state: T) : R {
+    get(state: T): R {
         if (localStorage.getItem(this.name) === undefined) {
             return this.getDefault(state);
-        }
-        else {
+        } else {
             const val = JSON.parse(localStorage.getItem(this.name));
             if (this.typeGuard && !this.typeGuard(val)) {
-                console.warn(`Found invalid shape of persistent data ${name}. Using default.`)
+                console.warn(`Found invalid shape of persistent data ${name}. Using default.`);
                 return this.getDefault(state);
             }
             return val;
@@ -29,7 +28,7 @@ export class PersistenceManager<T, R> {
         return initState;
     }
 
-    put(value: R) : void {
+    put(value: R): void {
         localStorage.setItem(this.name, JSON.stringify(value));
     }
 }

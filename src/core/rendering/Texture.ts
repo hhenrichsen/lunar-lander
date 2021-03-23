@@ -1,42 +1,42 @@
 import Vector2 from "../geometry/Vector2";
 
 export function drawTexture(
-  context: CanvasRenderingContext2D,
-  texture: Texture,
-  position: Vector2,
-  size: Vector2,
-  rotation = 0
+    context: CanvasRenderingContext2D,
+    texture: Texture,
+    position: Vector2,
+    size: Vector2,
+    rotation = 0
 ): void {
-  if (!texture.ready) {
-    return;
-  }
-  context.save();
-  context.translate(position.x, position.y);
-  context.rotate((rotation * Math.PI) / 180);
-  context.translate(-position.x, -position.y);
-  context.drawImage(
-    texture.texture,
-    position.x - size.x / 2,
-    position.y - size.y / 2,
-    size.x,
-    size.y
-  );
-  context.restore();
+    if (!texture.ready) {
+        return;
+    }
+    context.save();
+    context.translate(position.x, position.y);
+    context.rotate((rotation * Math.PI) / 180);
+    context.translate(-position.x, -position.y);
+    context.drawImage(
+        texture.texture,
+        position.x - size.x / 2,
+        position.y - size.y / 2,
+        size.x,
+        size.y
+    );
+    context.restore();
 }
 
 export class Texture {
-  size: Vector2;
-  el: HTMLImageElement;
-  ready = false;
-  constructor(texture: string, size: Vector2) {
-    this.el = new Image();
-    this.el.src = texture;
-    this.el.addEventListener("load", () => {
-      this.ready = true;
-    });
-  }
+    size: Vector2;
+    el: HTMLImageElement;
+    ready = false;
+    constructor(texture: string, size: Vector2) {
+        this.el = new Image();
+        this.el.src = texture;
+        this.el.addEventListener("load", () => {
+            this.ready = true;
+        });
+    }
 
-  get texture(): CanvasImageSource {
-    return this.el;
-  }
+    get texture(): CanvasImageSource {
+        return this.el;
+    }
 }

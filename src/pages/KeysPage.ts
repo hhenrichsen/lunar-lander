@@ -11,44 +11,44 @@ export class KeysPage implements Page<GlobalState<unknown>> {
     private state: GlobalState<KeyState>;
 
     constructor() {
-        this.updateKey = this.updateKey.bind(this)
+        this.updateKey = this.updateKey.bind(this);
     }
 
     load(base: HTMLElement, state: GlobalState<KeyState>): void {
         const { eventMap } = state.persistence.get(state);
-        const header = document.createElement('h1');
-        header.innerText = 'Key Configuration';
+        const header = document.createElement("h1");
+        header.innerText = "Key Configuration";
         base.appendChild(header);
 
-        const container = document.createElement('div');
-        container.classList.add('btn-container');
+        const container = document.createElement("div");
+        container.classList.add("btn-container");
 
         for (const key of Object.keys(eventMap)) {
-            const btn = document.createElement('button');
+            const btn = document.createElement("button");
             btn.id = key;
-            btn.innerText = `${key.replace(/([a-z](?=[A-Z]))/g, '$1 ')} (${eventMap[key]})`; // CamelCase -> Camel Case
-            btn.addEventListener('click', () => {
+            btn.innerText = `${key.replace(/([a-z](?=[A-Z]))/g, "$1 ")} (${eventMap[key]})`; // CamelCase -> Camel Case
+            btn.addEventListener("click", () => {
                 this.setListeningEvent(state, key);
             });
             container.appendChild(btn);
         }
 
         base.append(container);
-        const home = document.createElement('a');
+        const home = document.createElement("a");
         home.href = "#";
-        home.addEventListener('click', () => {
-            state.router.requestTransition('home');
-        })
+        home.addEventListener("click", () => {
+            state.router.requestTransition("home");
+        });
         home.innerText = "Back";
         base.appendChild(home);
     }
 
     init(globalState: GlobalState<unknown>): void {
         globalState.localState = {
-            'listeningEvent': ''
+            listeningEvent: "",
         };
         this.state = globalState as GlobalState<KeyState>;
-        document.addEventListener('keydown', this.updateKey);
+        document.addEventListener("keydown", this.updateKey);
     }
 
     canTransition(_: string): boolean {
@@ -56,18 +56,18 @@ export class KeysPage implements Page<GlobalState<unknown>> {
     }
 
     setListeningEvent(state: GlobalState<KeyState>, event: string): void {
-        document.querySelectorAll('button').forEach(it => it.classList.remove('waiting'));
+        document.querySelectorAll("button").forEach((it) => it.classList.remove("waiting"));
         state.localState.listeningEvent = event;
         const btn = document.getElementById(event);
-        btn.classList.add('waiting');
+        btn.classList.add("waiting");
         btn.innerText = "Waiting for keypress...";
     }
 
-    cleanup() : void {
-        document.removeEventListener('keydown', this.updateKey);
+    cleanup(): void {
+        document.removeEventListener("keydown", this.updateKey);
     }
 
-    updateKey(event: KeyboardEvent) : void {
+    updateKey(event: KeyboardEvent): void {
         const persistence = this.state.persistence.get(this.state);
         const { eventMap } = persistence;
         const { keys, commands, localState } = this.state;
@@ -77,14 +77,16 @@ export class KeysPage implements Page<GlobalState<unknown>> {
                 this.state.router.previous(this.state);
                 return;
             }
-            document.querySelectorAll('button').forEach(btn => {
-                btn.innerText = `${btn.id.replace(/([a-z](?=[A-Z]))/g, '$1 ')} (${eventMap[btn.id]})`; // CamelCase -> Camel Case
-                btn.classList.remove('waiting');
-            })
+            document.querySelectorAll("button").forEach((btn) => {
+                btn.innerText = `${btn.id.replace(/([a-z](?=[A-Z]))/g, "$1 ")} (${
+                    eventMap[btn.id]
+                })`; // CamelCase -> Camel Case
+                btn.classList.remove("waiting");
+            });
             localState.listeningEvent = "";
             return;
         }
-        if (localState.listeningEvent && localState.listeningEvent !== '') {
+        if (localState.listeningEvent && localState.listeningEvent !== "") {
             event.preventDefault();
             if (keys.hasKey(event.key) && eventMap[localState.listeningEvent] !== event.key) {
                 return;
@@ -95,12 +97,13 @@ export class KeysPage implements Page<GlobalState<unknown>> {
             mapToCommands(keys, commands, localState.listeningEvent, event.key, this.state);
             eventMap[commandKey] = event.key;
             const btn = document.getElementById(commandKey);
-            btn.innerText = `${commandKey.replace(/([a-z](?=[A-Z]))/g, '$1 ')} (${eventMap[commandKey]})`; // CamelCase -> Camel Case
+            btn.innerText = `${commandKey.replace(/([a-z](?=[A-Z]))/g, "$1 ")} (${
+                eventMap[commandKey]
+            })`; // CamelCase -> Camel Case
             persistence.eventMap = eventMap;
             this.state.persistence.put(persistence);
-            localState.listeningEvent = '';
-            btn.classList.remove('waiting');
+            localState.listeningEvent = "";
+            btn.classList.remove("waiting");
         }
     }
-
 }

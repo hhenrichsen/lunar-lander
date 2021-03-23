@@ -1,4 +1,4 @@
-import { buildState } from './init';
+import { buildState } from "./init";
 
 const globalState = buildState();
-globalState.router.requestTransition('home');
+globalState.router.requestTransition("home");
