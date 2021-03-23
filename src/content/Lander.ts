@@ -26,9 +26,10 @@ class ThrustGenerator implements ParticleGenerator<GlobalState<PlayState>> {
     }
     velocity(state: GlobalState<PlayState>): Vector2 {
         let v = state.localState.lander.rotationVector;
-        const rotation = random.gaussian(12) * 100;
+        const rotation = random.gaussian(12) * 50;
+        v = v.scale(10 * (random.gaussian(12)+0.5));
         v = v.rotate(rotation + this._rotationOffset);
-        v = v.scale(-5 * random.gaussian(12));
+        console.log(v.toString());
         return v;
     }
     lifetime(state: GlobalState<PlayState>): number {
@@ -101,10 +102,10 @@ export class Lander implements Drawable<GlobalState<PlayState>>, Ticking<GlobalS
                 state.localState.lander.fuel > 0 &&
                 !this._frozen,
             0.03,
-            5
+            10
         );
         this.leftRotationEmitter = new ParticleEmitter(
-            new ThrustGenerator(90),
+            new ThrustGenerator(-90),
             (state) =>
                 state.localState.lander.turningLeft &&
                 state.localState.lander.fuel > 0 &&
@@ -113,7 +114,7 @@ export class Lander implements Drawable<GlobalState<PlayState>>, Ticking<GlobalS
             3
         );
         this.rightRotationEmitter = new ParticleEmitter(
-            new ThrustGenerator(-90),
+            new ThrustGenerator(90),
             (state) =>
                 state.localState.lander.turningRight &&
                 state.localState.lander.fuel > 0 &&
