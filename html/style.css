@@ -67,7 +67,7 @@ a:hover {
 
 canvas {
     background-size: fill;
-    background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/NASA-Apollo8-Dec24-Earthrise.jpg/1200px-NASA-Apollo8-Dec24-Earthrise.jpg");
+    background-image: url("assets/bg.jpg");
     margin: auto;
     background-repeat: no-repeat;
     background-attachment: fixed;
